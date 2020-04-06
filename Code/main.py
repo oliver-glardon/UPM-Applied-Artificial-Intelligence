@@ -93,6 +93,7 @@ pca_output = "Principal Component Analysis (PCA) \n\n" \
 principal_components_test = pca.transform(df_test_input_)
 
 #_______________________________________________________________________________________________________________________
+# Text from homework description:
 # Viability of the following techniques for classification using previous dimensionality reduction with PCA. Obtain the
 # confusion matrix. Compare the results with the other techniques
 #_______________________________________________________________________________________________________________________
