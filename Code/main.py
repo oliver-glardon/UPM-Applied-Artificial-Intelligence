@@ -1,4 +1,4 @@
-# Group Information: Intelligencia Artificial Applicada, UPM
+# Group Information: Inteligencia Artificial Applicada, UPM
 # .....
 # ....
 # Oliver Glardon, 19936
@@ -169,6 +169,11 @@ print("\nMethod: STILL TO ADD" +
 #_______________________________________________________________________________________________________________________
 # TASK 5: SOM
 # ....
+
+#_______________________________________________________________________________________________________________________
+
+
+
 
 #_______________________________________________________________________________________________________________________
 # Optional tasks for obtaining top marks above 7: (WE SHOULD ALSO DO THAT)
