@@ -42,7 +42,7 @@ print(df_total)
 print(line_str)
 
 # Loop to collect data for different testing and training data
-num_repetitions_per_parameter_setting = 10
+num_repetitions_per_parameter_setting = 1
 df_results = pd.DataFrame(columns=['Run', 'Neighbors', 'Prediction Accuracy', 'Runtime [sec]'])
 pos_count = 0
 j = 0
