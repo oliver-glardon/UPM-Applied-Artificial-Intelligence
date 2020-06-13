@@ -1,3 +1,7 @@
+# Group Information: Inteligencia Artificial Applicada, UPM
+# .....
+# ....
+# Oliver Glardon, 19936
 #_______________________________________________________________________________________________________________________
 # imports
 from scipy.io import loadmat
@@ -16,9 +20,37 @@ os.chdir('../')
 #_______________________________________________________________________________________________________________________
 # Parameters for printing outputs
 line_str = "-------------"
+#_______________________________________________________________________________________________________________________
+# TASK 0: Load the input data
+# df_total (dataframe)
+# Rows: Every row is an data instance (10000)
+# Columns:
+#   (1) One column "class" defines the classification (1-10)
+#   (2) The remaining 784 columns define the pixels of the image (784 -> 28x28)
+print("Loading the data\n" + line_str)
+trainnumbers = loadmat('Data/Trainnumbers.mat')
+input = trainnumbers['Trainnumbers'][0][0][0]
+df_input = pd.DataFrame(input.T)
+output = trainnumbers['Trainnumbers'][0][0][1]
+df_output = pd.DataFrame(output.T)
+df_total = df_input.copy()
+df_total['class'] = df_output.values # total dataframe containing all data
+print("Input Dataframe"
+      "\nRows: \n  Every row is a data instance (10000)\nColumns:\n  (1) One column 'class' defines the "
+      "classification (0-9)\n  (2) The remaining 784 columns define the pixels of the image (784 -> 28x28)\n")
+print(df_total)
+print(line_str)
 
-def predict_knn(df_test_input, param_1, param_2):
-    df_
+# Loop to collect data for different testing and training data
+num_repetitions_per_parameter_setting = 2
+df_results = pd.DataFrame(columns=['Run', 'Neighbors', 'Prediction Accuracy', 'Runtime [sec]'])
+pos_count = 0
+j = 0
+while j < num_repetitions_per_parameter_setting:
+    print("Run: " + str(j+1) + "\n" + line_str)
+    j = j+1
+    start_time = time.time()
+
     #_______________________________________________________________________________________________________________________
     #print("Split into training and testing data\n" + line_str)
     # Split into training and testing data
@@ -30,9 +62,6 @@ def predict_knn(df_test_input, param_1, param_2):
     df_train_output = pd.DataFrame(df_train_set['class'])
     df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
     df_test_output = pd.DataFrame(df_test_set['class'])
-
-    df_test_input
-    df_train_input
 
     #_____________________________________________________________________________________________________________________
     # TASK 1: PCA (dimensionality reduction)
@@ -70,8 +99,27 @@ def predict_knn(df_test_input, param_1, param_2):
                     "MSE (training data): " + str(round(MSE_PCA_train, 3)) + "\n" + line_str
     print(pca_output)
 
+
     # calculate the PCs for the test data as well
     principal_components_test = pca.transform(df_test_input_)
+
+    #_______________________________________________________________________________________________________________________
+    # TASK 6: Fisher Discriminant
+    fisher = LinearDiscriminantAnalysis()
+    fisher.fit(df_train_input_, df_train_output['class'].values)
+    fisher_components_train = fisher.transform(df_train_input_)
+    fisher_components_test = fisher.transform(df_test_input_)
+
+    # Adding Fisher Discrimant Analysis to PCA
+    fisher_pca = LinearDiscriminantAnalysis()
+    fisher_pca.fit(principal_components_train, df_train_output['class'].values)
+    fisher_pca_components_train = fisher_pca.transform(principal_components_train)
+    fisher_pca_components_test = fisher_pca.transform(principal_components_test)
+
+    #_______________________________________________________________________________________________________________________
+    # Text from homework description:
+    # Viability of the following techniques for classification using previous dimensionality reduction with PCA. Obtain the
+    # confusion matrix. Compare the results with the other techniques
 
     # _______________________________________________________________________________________________________________________
     # Loop for different parameter settings:
@@ -117,3 +165,22 @@ def predict_knn(df_test_input, param_1, param_2):
 df_results.to_pickle('Data/knn_results.pickle')
 df = pd.read_pickle('Data/knn_results.pickle')
 print(df)
+
+# create result table
+df_results = pd.DataFrame(columns=['Number of neighbors', 'Average', 'Max', 'Min', 'Average runtime [sec]'])
+pos_count = 0
+#num_neigh_array = [1, 3, 5, 7, 9]
+num_neigh_array = [1, 3, 5, 7, 9]
+for i in num_neigh_array:
+    df_results.loc[pos_count] = [str(i),
+                                 df[df['Neighbors']==str(i)]['Prediction Accuracy'].mean(),
+                                 df[df['Neighbors']==str(i)]['Prediction Accuracy'].max(),
+                                 df[df['Neighbors'] == str(i)]['Prediction Accuracy'].min(),
+                                 df[df['Neighbors'] == str(i)]['Runtime [sec]'].mean()
+                                 ]
+    pos_count = pos_count + 1
+
+print(df_results)
+Path = r'C:\Users\Oliver\Documents\Dokumente\Studium\M.Sc. UPM\Intelligencia Artificial Applicada\Trabajo' \
+             '\knn_results.csv'
+df_results.to_csv(Path, index=False, header=True)

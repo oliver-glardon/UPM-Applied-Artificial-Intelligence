@@ -79,14 +79,17 @@ while j < num_repetitions_per_parameter_setting:
     df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
     df_test_input_ = pd.DataFrame(stsc.transform(df_test_input))
 
+    df_train_input_ = df_train_input
+    df_test_input_ = df_test_input
+
     # PCA
     minimum_explained_variance = 0.95
-    pca = PCA(minimum_explained_variance)
+    #pca = PCA(minimum_explained_variance)
 
     # alternative:
     # Choose the number of components by our own
-    #number_principal_components = 10
-    #pca = PCA(n_components=number_principal_components)
+    number_principal_components = 100
+    pca = PCA(n_components=number_principal_components)
 
     pca.fit(df_train_input_)
     principal_components_train = pca.transform(df_train_input_)
@@ -184,23 +187,6 @@ while j < num_repetitions_per_parameter_setting:
     pos_count = pos_count + 1
     start_time = time.time()
 
-    ''' not working yet!
-    print("Naive Bayes Classification")
-    bayes = CategoricalNB()
-    bayes.fit(principal_components_train, df_train_output['class'].values)
-    bayes_labels_pred = bayes.predict(principal_components_test)
-    bayes_results = (df_test_output['class'].values == bayes_labels_pred)
-    bayes_percentage_of_correct_predictions_categorical = bayes_results.sum() / len(bayes_results)
-    print("\nMethod: Categorical Naive Bayes" +
-          "\nPercentage of correct prediction: " + str(bayes_percentage_of_correct_predictions_categorical) +
-          "\n" + line_str)
-
-    # store values in Dataframe
-    df_results.loc[pos_count] = [str(j),'Categorical',bayes_percentage_of_correct_predictions_categorical,
-                                 intermed_time + time.time() - start_time]
-    pos_count = pos_count + 1
-    '''
-
 # print results and store to a pickle-file as a basis for later visualization
 print(df_results)
 df_results.to_pickle('Data/bayes_results.pickle')
@@ -209,7 +195,7 @@ df_results.to_pickle('Data/bayes_results.pickle')
 df = pd.read_pickle('Data/bayes_results.pickle')
 print(df)
 
-# create table
+# create result table
 df_results = pd.DataFrame(columns=['Method', 'Average', 'Max', 'Min', 'Average runtime [sec]'])
 pos_count = 0
 num_neigh_array = ['Gaussian', 'Multinominal', 'Complement', 'Bernoulli']
@@ -223,10 +209,9 @@ for i in num_neigh_array:
     pos_count = pos_count + 1
 
 print(df_results)
-'''
+
 # Set the current directory
 os.chdir('../')
-Path = r'C:\Users\Oliver\Documents\Dokumente\Studium\M.Sc. UPM\Intelligencia Artificial Applicada\Trabajo' \
+Path = r'C:\ Users\Oliver\Documents\Dokumente\Studium\M.Sc. UPM\Intelligencia Artificial Applicada\Trabajo' \
              '\Bayes_results.csv'
 df_results.to_csv(Path, index=False, header=True)
-'''

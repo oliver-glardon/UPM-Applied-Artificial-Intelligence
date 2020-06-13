@@ -56,6 +56,18 @@ df_train_output = pd.DataFrame(df_train_set['class'])
 df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
 df_test_output = pd.DataFrame(df_test_set['class'])
 
+
+______CUT
+
+call the function(y,x)
+
+hacer el fichero matlab
+
+________END______CUT
+
+
+
+
 #_______________________________________________________________________________________________________________________
 # Show the images
 def display_number(data):

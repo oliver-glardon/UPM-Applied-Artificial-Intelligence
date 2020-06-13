@@ -25,20 +25,3 @@ def display_number(data):
     plt.imshow(np.array(data).reshape(28, 28))
 
 # Method to split data into training and testing data
-def split_into_train_and_test(data, percentage_of_training_data = 0.8):
-    print("Split into training and testing data\n" + line_str)
-    df_train_set = data.sample(frac=percentage_of_training_data, random_state=0)
-    df_test_set = data.drop(df_train_set.index)
-    df_train_input = pd.DataFrame(df_train_set.loc[:, df_train_set.columns != 'class'])
-    df_train_output = pd.DataFrame(df_train_set['class'])
-    df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
-    df_test_output = pd.DataFrame(df_test_set['class'])
-    return df_train_input, df_train_output, df_test_input, df_test_output
-
-def standardize(df_train_input, df_test_input):
-    print("Standardizing the data\n" + line_str)
-    stsc = StandardScaler()
-    stsc.fit(df_train_input)
-    df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
-    df_test_input_ = pd.DataFrame(stsc.transform(df_test_input))
-    return df_train_input, df_test_input
