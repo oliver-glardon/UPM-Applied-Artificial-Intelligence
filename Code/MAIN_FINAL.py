@@ -65,7 +65,7 @@ if split_data:
     df_train_output = pd.DataFrame(df_train_set['class'])
     df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
     df_test_output = pd.DataFrame(df_test_set['class'])
-
+    train_class = df_train_output['class'].values
 # CASE 2: use external testing data
 else:
     print("Load external testing data\n" + line_str)
