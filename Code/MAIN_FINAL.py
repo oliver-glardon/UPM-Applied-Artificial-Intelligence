@@ -1,13 +1,24 @@
-# Group Information: Inteligencia Artificial Applicada, UPM
-# Sorelyss _____
-# Emiliano ____
-# Oliver Glardon, 19936
+# Group Information: Intelligencia Artificial Applicada, UPM
+# Emiliano Capogrossi, M18029
+# Oliver Glardon, M19936
+# Sorelys Sandoval, M19237
 #_______________________________________________________________________________________________________________________
 # imports
-from scipy.io import loadmat
 import os
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.io as sio
 import pandas as pd
 import time
+from sklearn.metrics import confusion_matrix
+from utils.plot_cm import plot_confusion_matrix
+
+# Variables
+names = ['M18029', 'M19936', 'M19237']
+labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+techniques = ('KNN', 'BAYES','MLP', 'SOM', 'K-MEANS')
+running_time = []
+percentage_of_correct_predictions = []
 
 #_______________________________________________________________________________________________________________________
 # Set the current directory
@@ -16,6 +27,7 @@ os.chdir('../')
 #_______________________________________________________________________________________________________________________
 # Parameters for printing outputs
 line_str = "-------------"
+
 #_______________________________________________________________________________________________________________________
 # TASK 0: Load the input data
 # df_total (dataframe)
@@ -36,8 +48,8 @@ print("Input Dataframe"
       "classification (1-10)\n  (2) The remaining 784 columns define the pixels of the image (784 -> 28x28)\n")
 print(df_total)
 print(line_str)
-#_______________________________________________________________________________________________________________________
 
+#_______________________________________________________________________________________________________________________
 # CHOOSE DATA USAGE TYPE
 split_data = True
 
@@ -53,6 +65,7 @@ if split_data:
     df_train_output = pd.DataFrame(df_train_set['class'])
     df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
     df_test_output = pd.DataFrame(df_test_set['class'])
+
 # CASE 2: use external testing data
 else:
     print("Load external testing data\n" + line_str)
@@ -62,55 +75,239 @@ else:
     df_train_output = pd.DataFrame(df_train_set['class'])
     # Load external testing data
     # todo load external traing data
-    testnumbers = loadmat('Data/Trainnumbers.mat')
-    input = testnumbers['Trainnumbers'][0][0][0]
+    testnumbers = sio.loadmat('Data/Test_numbers.mat')
+    input = testnumbers['Test_numbers'][0][0][0]
     df_test_input = pd.DataFrame(input.T)
+
 
 #_______________________________________________________________________________________________________________________
 print("Call the different classfier\n" + line_str)
 
-# Call knn
+#_______________________________________________________________________________________________________________________
+# Knn
+# ....
+
+technique = 'knn'
 start_time = time.time()
+
+#Params
 param_1 = df_train_input
 param_2 = df_train_output
-res_knn = predict_knn(df_test_input, param_1, param_2)
+
+#Function
+knn_predictions, no_PCA = predict_knn(df_test_input, param_1, param_2)
+
 runtime_knn = time.time() - start_time
 
-# Call bayes
-start_time = time.time()
-params = df_test_input
-res_bayes = predict_bayes(df_test_input, params)
-runtime_bayes = time.time() - start_time
+#
+if split_data:
+    # ....
+    # Plot Confusion Matrix
 
-'''
-# Call mlp
-start_time = time.time()
-params = None
-res_mlp = predict_mlp(df_test_input, params)
-runtime_mlp = time.time() - start_time
+    cm = confusion_matrix(test_class, kme_predictions)
+    plot_confusion_matrix(cm, labels)
 
-# Call som
-start_time = time.time()
-params = None
-res_som = predict_som(df_test_input, params)
-runtime_som = time.time() - start_time
+    # ....
+    # Calculate percentage of correct predictions
+    alg_results = (test_class == kme_predictions)
+    percentage = alg_results.sum() / len(alg_results)
+    percentage_of_correct_predictions.append(percentage)
+    running_time.append(runtime_knn)
 
-# Call kmeans
-start_time = time.time()
-params = None
-res_kmeans = predict_kmeans(df_test_input, params)
-runtime_kmeans = time.time() - start_time
-'''
+# ....
+# Code to convert the results to a matlab file specified in the homework description
+
+print("Export results for algorith: "+ technique +"\n" + line_str)
+
+for name in names:
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': knn_predictions})
 
 #_______________________________________________________________________________________________________________________
+# Bayesian Classifiers
+# ....
+
+technique = 'bay'
+start_time = time.time()
+
+#Params
+param_1 = df_train_input
+param_2 = df_train_output
+
+#Function
+bay_predictions, no_PCA = predict_bay(df_test_input, param_1, param_2)
+
+runtime_bay = time.time() - start_time
+
+#
+if split_data:
+    # ....
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, bay_predictions)
+    plot_confusion_matrix(cm, labels)
+
+    # ....
+    # Calculate percentage of correct predictions
+    alg_results = (test_class == bay_predictions)
+    percentage = alg_results.sum() / len(alg_results)
+    percentage_of_correct_predictions.append(percentage)
+    running_time.append(runtime_bay)
+
+# ....
+# Code to convert the results to a matlab file specified in the homework description
+
+print("Export results for algorith: "+ technique +"\n" + line_str)
+
+for name in names:
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': bay_predictions})
+
+#_______________________________________________________________________________________________________________________
+# MLP
+# ....
+
+technique = 'mlp'
+start_time = time.time()
+
+#Params
+param_1 = df_train_input
+param_2 = df_train_output
+
+#Function
+mlp_predictions, no_PCA = predict_mlp(df_test_input, param_1, param_2)
+
+runtime_mlp = time.time() - start_time
+
+#
+if split_data:
+    # ....
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, mlp_predictions)
+    plot_confusion_matrix(cm, labels)
+
+    # ....
+    # Calculate percentage of correct predictions
+    alg_results = (test_class == mlp_predictions)
+    percentage = alg_results.sum() / len(alg_results)
+    percentage_of_correct_predictions.append(percentage)
+    running_time.append(runtime_mlp)
+
+# ....
+# Code to convert the results to a matlab file specified in the homework description
+
+print("Export results for algorith: "+ technique +"\n" + line_str)
+
+for name in names:
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': mlp_predictions})
+
+
+#_______________________________________________________________________________________________________________________
+# SOM
+# ....
+
+technique = 'som'
+start_time = time.time()
+
+#Params
+param_1 = df_train_input
+param_2 = df_train_output
+
+#Function
+som_predictions, no_PCA = predict_som(df_test_input, param_1, param_2)
+
+runtime_som = time.time() - start_time
+
+#
+if split_data:
+    # ....
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, som_predictions)
+    plot_confusion_matrix(cm, labels)
+
+    # ....
+    # Calculate percentage of correct predictions
+    alg_results = (test_class == som_predictions)
+    percentage = alg_results.sum() / len(alg_results)
+    percentage_of_correct_predictions.append(percentage)
+    running_time.append(runtime_knn)
+# ....
+# Code to convert the results to a matlab file specified in the homework description
+
+print("Export results for algorith: "+ technique +"\n" + line_str)
+
+for name in names:
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': som_predictions})
+
+
+#_______________________________________________________________________________________________________________________
+# K-MEANS
+# ....
+
+technique = 'kme'
+start_time = time.time()
+
+#Params
+param_1 = df_train_input
+param_2 = df_train_output
+
+#Function
+kme_predictions, no_PCA = predict_kme(df_test_input, param_1, param_2)
+
+runtime_knn = time.time() - start_time
+
+#
+if split_data:
+    # ....
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, kme_predictions)
+    plot_confusion_matrix(cm, labels)
+
+    # ....
+    # Calculate percentage of correct predictions
+    alg_results = (test_class == kme_predictions)
+    percentage = alg_results.sum() / len(alg_results)
+    percentage_of_correct_predictions.append(percentage)
+    running_time.append(runtime_knn)
+
+# ....
+# Code to convert the results to a matlab file specified in the homework description
+
+print("Export results for algorith: "+ technique +"\n" + line_str)
+
+for name in names:
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': kme_predictions})
+
+
+#_______________________________________________________________________________________________________________________
+# Graphics
+# ....
+if split_data:
+    # Graphic Bar Percentage
+    # ....
+
+    y_pos = np.arange(len(techniques))
+    plt.bar(y_pos, percentage_of_correct_predictions, color=(0.2, 0.4, 0.6, 0.6))
+    plt.xticks(y_pos, techniques)
+    plt.show()
+
+# Graphic Bar Time Elapse
+# ....
+
+y_pos = np.arange(len(techniques))
+plt.bar(y_pos, running_time, color=(0.2, 0.4, 0.6, 0.6))
+plt.xticks(y_pos, techniques)
+plt.show()
+
+#_______________________________________________________________________________________________________________________
+# Result table
+# ....
 print("Create result table\n" + line_str)
 
 #todo result table
 
 #_______________________________________________________________________________________________________________________
-print("Export results\n" + line_str)
-
-#todo create matlab file according to the task description
-
-#_______________________________________________________________________________________________________________________
 print("End\n" + line_str)
+
+exit()
