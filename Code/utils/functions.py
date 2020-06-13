@@ -41,7 +41,7 @@ def standardize(df_train_input, df_test_input):
     stsc.fit(df_train_input)
     df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
     df_test_input_ = pd.DataFrame(stsc.transform(df_test_input))
-    return df_train_input, df_test_input
+    return df_train_input_, df_test_input_
 
 
 def load_data(filename):
