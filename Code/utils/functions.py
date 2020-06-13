@@ -16,13 +16,35 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from DataReader import DataReader
 
 # Parameters for printing outputs
 line_str = "-------------"
 
+
+def display_n_numbers(data, n):
+    data = np.array(data).reshape(28, 28)
+    x1 = min(n // 2, 5)
+    if x1 == 0:
+        x1 = 1
+    y1 = (n // x1)
+    x = min(x1, y1)
+    y = max(x1, y1)
+    fig, ax = plt.subplots(x, y, figsize=(5, 5))
+    i = 0
+    for j in range(x):
+        for k in range(y):
+            i = np.random.choice(range(len(data)))
+            ax[j][k].set_axis_off()
+            ax[j][k].imshow(data[i:i + 1][0])
+            i += 1
+    plt.show()
+
+
 def display_number(data):
     plt.imsave('filename.png', np.array(data).reshape(28, 28), cmap=cm.gray)
     plt.imshow(np.array(data).reshape(28, 28))
+
 
 # Method to split data into training and testing data
 def split_into_train_and_test(data, percentage_of_training_data = 0.8):
@@ -34,6 +56,7 @@ def split_into_train_and_test(data, percentage_of_training_data = 0.8):
     df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
     df_test_output = pd.DataFrame(df_test_set['class'])
     return df_train_input, df_train_output, df_test_input, df_test_output
+
 
 def standardize(df_train_input, df_test_input):
     print("Standardizing the data\n" + line_str)
