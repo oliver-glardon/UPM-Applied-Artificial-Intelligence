@@ -10,6 +10,7 @@ import numpy as np
 import scipy.io as sio
 import pandas as pd
 import time
+from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
 
@@ -66,6 +67,7 @@ if split_data:
     df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
     df_test_output = pd.DataFrame(df_test_set['class'])
     train_class = df_train_output['class'].values
+    test_class = df_test_output['class'].values
 
 # CASE 2: use external testing data
 else:
@@ -107,11 +109,13 @@ if split_data:
 
     cm = confusion_matrix(test_class, kme_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == kme_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, kme_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
@@ -146,11 +150,13 @@ if split_data:
 
     cm = confusion_matrix(test_class, bay_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == bay_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, bay_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_bay)
 
@@ -185,11 +191,13 @@ if split_data:
 
     cm = confusion_matrix(test_class, mlp_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == mlp_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, mlp_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_mlp)
 
@@ -225,11 +233,13 @@ if split_data:
 
     cm = confusion_matrix(test_class, som_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == som_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, som_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 # ....
@@ -264,11 +274,13 @@ if split_data:
 
     cm = confusion_matrix(test_class, kme_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == kme_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, kme_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
