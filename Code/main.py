@@ -171,6 +171,11 @@ print("\nMethod: STILL TO ADD" +
 # ....
 
 #_______________________________________________________________________________________________________________________
+
+
+
+
+#_______________________________________________________________________________________________________________________
 # Optional tasks for obtaining top marks above 7: (WE SHOULD ALSO DO THAT)
 # Task 6.- Use Linear Fisher Discriminant for reducing the dimensionality
 # Task 7.- Use K-means for clustering the images
