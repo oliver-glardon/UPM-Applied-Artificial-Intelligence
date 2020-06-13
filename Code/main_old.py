@@ -1,7 +1,7 @@
-# Group Information: Inteligencia Artificial Applicada, UPM
-# .....
-# ....
+# Group Information: Intelligencia Artificial Applicada, UPM
+# Emiliano Capogrossi, 18029
 # Oliver Glardon, 19936
+# Sorelys Sandoval, 19237
 #_______________________________________________________________________________________________________________________
 # imports
 from scipy.io import loadmat
