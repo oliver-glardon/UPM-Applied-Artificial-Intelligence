@@ -36,7 +36,7 @@ line_str = "-------------"
 #   (1) One column "class" defines the classification (1-10)
 #   (2) The remaining 784 columns define the pixels of the image (784 -> 28x28)
 print("Loading the data\n" + line_str)
-trainnumbers = loadmat('Data/Trainnumbers.mat')
+trainnumbers = sio.loadmat('Data/Trainnumbers.mat')
 input = trainnumbers['Trainnumbers'][0][0][0]
 df_input = pd.DataFrame(input.T)
 output = trainnumbers['Trainnumbers'][0][0][1]
@@ -121,7 +121,7 @@ if split_data:
 print("Export results for algorith: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': knn_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
 
 #_______________________________________________________________________________________________________________________
 # Bayesian Classifiers
@@ -160,7 +160,7 @@ if split_data:
 print("Export results for algorith: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': bay_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
 
 #_______________________________________________________________________________________________________________________
 # MLP
@@ -199,7 +199,7 @@ if split_data:
 print("Export results for algorith: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': mlp_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -238,7 +238,7 @@ if split_data:
 print("Export results for algorith: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': som_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -278,7 +278,7 @@ if split_data:
 print("Export results for algorith: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': kme_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
