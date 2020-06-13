@@ -118,7 +118,7 @@ if split_data:
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: " + technique + "\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
@@ -157,7 +157,7 @@ if split_data:
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
@@ -196,7 +196,7 @@ if split_data:
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
@@ -235,7 +235,7 @@ if split_data:
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions.values)})
@@ -275,7 +275,7 @@ if split_data:
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
