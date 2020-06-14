@@ -23,10 +23,14 @@ import pandas as pd
 import time
 import joblib
 
-train = False
+train = True
 
 
 def predict_mlp(test_input, test_output, df_input, img_class):
+
+    test_input /= 255.
+    df_input /= 255.
+
     img_class=img_class.values
     test_output=test_output.values
     # One-Hot
@@ -42,8 +46,8 @@ def predict_mlp(test_input, test_output, df_input, img_class):
     df_test_input_ = pd.DataFrame(stsc.transform(df_test_input_))
 
     # PCA
-    minimum_explained_variance = 0.95
-    pca = PCA(minimum_explained_variance)
+    number_principal_components = 100
+    pca = PCA(n_components=number_principal_components)
 
     pca.fit(df_input_)
     principal_components_train = pca.transform(df_input_)
@@ -87,7 +91,7 @@ def predict_mlp(test_input, test_output, df_input, img_class):
 
     else:
         # load the model from disk
-        filename = 'Data/mlp_models/NEUPYmlp2_model-run_0-data_1.sav'
+        filename = 'Data/mlp_models/NEUPY_mlp2_model-run_2-data_2.sav'
         mlp2 = joblib.load(filename)
 
     # _______________________________________________________________________________________________________________________
