@@ -11,6 +11,7 @@ import numpy as np
 import scipy.io as sio
 import pandas as pd
 import time
+from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
 from knn import predict_knn
@@ -39,7 +40,7 @@ line_str = "-------------"
 #   (1) One column "class" defines the classification (1-10)
 #   (2) The remaining 784 columns define the pixels of the image (784 -> 28x28)
 print("Loading the data\n" + line_str)
-trainnumbers = loadmat('Data/Trainnumbers.mat')
+trainnumbers = sio.loadmat('Data/Trainnumbers.mat')
 input = trainnumbers['Trainnumbers'][0][0][0]
 df_input = pd.DataFrame(input.T)
 output = trainnumbers['Trainnumbers'][0][0][1]
@@ -68,6 +69,8 @@ if split_data:
     df_train_output = pd.DataFrame(df_train_set['class'])
     df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
     df_test_output = pd.DataFrame(df_test_set['class'])
+    train_class = df_train_output['class'].values
+    test_class = df_test_output['class'].values
 
 # CASE 2: use external testing data
 else:
@@ -107,23 +110,25 @@ if split_data:
     # ....
     # Plot Confusion Matrix
 
-    cm = confusion_matrix(df_test_output, knn_predictions)
+    cm = confusion_matrix(test_class, kme_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (df_test_output == knn_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, kme_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: " + technique + "\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': knn_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
 
 #_______________________________________________________________________________________________________________________
 # Bayesian Classifiers
@@ -146,23 +151,25 @@ if split_data:
     # ....
     # Plot Confusion Matrix
 
-    cm = confusion_matrix(df_test_output, bay_predictions)
+    cm = confusion_matrix(test_class, bay_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (df_test_output == bay_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, bay_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_bay)
 
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': bay_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
 
 #_______________________________________________________________________________________________________________________
 # MLP
@@ -187,21 +194,23 @@ if split_data:
 
     cm = confusion_matrix(test_class, mlp_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == mlp_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, mlp_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_mlp)
 
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': mlp_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -227,20 +236,22 @@ if split_data:
 
     cm = confusion_matrix(test_class, som_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == som_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, som_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': som_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -266,21 +277,23 @@ if split_data:
 
     cm = confusion_matrix(test_class, kme_predictions)
     plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.close()
 
     # ....
-    # Calculate percentage of correct predictions
-    alg_results = (test_class == kme_predictions)
-    percentage = alg_results.sum() / len(alg_results)
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, kme_predictions)
+
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
-print("Export results for algorith: "+ technique +"\n" + line_str)
+print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': kme_predictions})
+    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________

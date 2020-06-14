@@ -9,17 +9,22 @@
 from scipy.io import loadmat
 import os
 import numpy as np
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, Normalizer
+from sklearn.preprocessing import StandardScaler, Binarizer, Normalizer, OneHotEncoder
 from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn import model_selection, metrics, datasets
-from neupy import algorithms, layers
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix
+from utils.plot_cm import plot_confusion_matrix
+import matplotlib.pyplot as plt
+
 import pandas as pd
 import time
 import joblib
 
 train = True
+type_run = ""
+labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 # _______________________________________________________________________________________________________________________
 # Set the current directory
@@ -50,51 +55,103 @@ print(df_total)
 print(line_str)
 
 # Loop to collect data for different testing and training data
-num_repetitions_per_parameter_setting = 5
-df_results = pd.DataFrame(columns=['Run', 'Data used', 'Preprocessing', 'NN1 Pred. Acc.', 'NN2 Pred. Acc.', 'Runtime [sec]'])
+num_repetitions_per_parameter_setting = 4
+df_results = pd.DataFrame(columns=['Run', 'Preprocessing', 'Data used', 'NN1 Pred. Acc.', 'NN2 Pred. Acc.', 'Runtime [sec]'])
 pos_count = 0
 
 print("Multilayer Perceptron (MLP)\n")
 
+# _______________________________________________________________________________________________________________________
+# Split into training and testing data
+
+# print("Split into training and testing data\n" + line_str)
+percentage_of_training_data = 0.8
+df_train_set = df_total.sample(frac=percentage_of_training_data)
+df_test_set = df_total.drop(df_train_set.index)
+# final training and test data
+df_train_input = pd.DataFrame(df_train_set.loc[:, df_train_set.columns != 'class'])
+df_train_output = pd.DataFrame(df_train_set['class'])
+df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
+df_test_output = pd.DataFrame(df_test_set['class'])
+train_class = df_train_output['class'].values
+test_class = df_test_output['class'].values
+
+# One-Hot
+target_scaler = OneHotEncoder(sparse=False, categories='auto')
+train_class = target_scaler.fit_transform(train_class.reshape(-1, 1))
+test_class = target_scaler.fit_transform(test_class.reshape(-1, 1))
+
+# _____________________________________________________________________________________________________________________
+# Loop
+# ...
+total_time = time.time()
 for j in range(num_repetitions_per_parameter_setting):
     print("Run: " + str(j + 1) + "\n" + line_str)
     start_time = time.time()
 
-    # _______________________________________________________________________________________________________________________
-    # Split into training and testing data
-
-    # print("Split into training and testing data\n" + line_str)
-    percentage_of_training_data = 0.8
-    df_train_set = df_total.sample(frac=percentage_of_training_data)
-    df_test_set = df_total.drop(df_train_set.index)
-    # final training and test data
-    df_train_input = pd.DataFrame(df_train_set.loc[:, df_train_set.columns != 'class'])
-    df_train_output = pd.DataFrame(df_train_set['class'])
-    df_test_input = pd.DataFrame(df_test_set.loc[:, df_test_set.columns != 'class'])
-    df_test_output = pd.DataFrame(df_test_set['class'])
-
     # _____________________________________________________________________________________________________________________
-    # Standardize/Normalize data
-    # data are now named with an additional "_" at the end
-    # print("Standardizing the data\n" + line_str)
-    if j < 2:
-        preprocessing = 'Rescale'
-        scaler = MinMaxScaler(feature_range=(0, 1))
-        df_train_input_ = pd.DataFrame(scaler.fit_transform(df_train_input))
-        df_test_input_ = pd.DataFrame(scaler.fit_transform(df_test_input))
-    elif j < 4:
-        preprocessing = 'Standarized'
-        stsc = StandardScaler().fit(df_train_input)
-        df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
-        df_test_input_ = pd.DataFrame(stsc.transform(df_test_input))
+    # Preprocessing
+    # ...
+
+    # Rescale - adding bias to prevent weights from not being updated
+    if j == 5:
+        fac = 0.99 / 255
+        df_train_input = df_train_input * fac + 0.01
+        df_test_input = df_test_input * fac + 0.01
+
+        train_class[train_class == 0] = 0.01
+        train_class[train_class == 1] = 0.99
+        test_class[test_class == 0] = 0.01
+        test_class[test_class == 1] = 0.99
+
     else:
-        preprocessing = 'Rescale+Standarized'
+        df_train_input /= 255.
+        df_test_input /= 255.
+
+    #
+    if j == 0:
+        preprocessing = 'Without preprocessing'
+        df_train_input_ = df_train_input
+        df_test_input_ = df_test_input
+
+    if j == 1:
+        preprocessing = 'Normalize'
         stsc = Normalizer().fit(df_train_input)
         df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
-        df_test_input_ = pd.DataFrame(stsc.transform(df_test_input))
+        stsc1 = Normalizer().fit(df_test_input)
+        df_test_input_ = pd.DataFrame(stsc1.transform(df_test_input))
+    elif j == 2:
+        preprocessing = 'Standarized'
         stsc = StandardScaler().fit(df_train_input)
+        stsc1 = StandardScaler().fit(df_test_input)
         df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
-        df_test_input_ = pd.DataFrame(stsc.transform(df_test_input))
+        df_test_input_ = pd.DataFrame(stsc1.transform(df_test_input))
+    elif j == 3:
+        preprocessing = 'Normalize+Standarized'
+        stsc = Normalizer().fit(df_train_input)
+        stsc1 = Normalizer().fit(df_test_input)
+        df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
+        df_test_input_ = pd.DataFrame(stsc1.transform(df_test_input))
+        stsc = StandardScaler().fit(df_train_input)
+        stsc1 = StandardScaler().fit(df_test_input)
+        df_train_input_ = pd.DataFrame(stsc.transform(df_train_input_))
+        df_test_input_ = pd.DataFrame(stsc1.transform(df_test_input_))
+    elif j == 4:
+        preprocessing = 'simple_github'
+        df_train_input_ -= df_train_input.mean(axis=0)
+        df_test_input_ -= df_train_input.mean(axis=0)
+
+    if type_run == "BIN":
+        preprocessing = preprocessing + '+Binarized'
+        stsc = Binarizer().fit(df_train_input)
+        stsc1 = Binarizer().fit(df_test_input)
+        df_train_input_ = pd.DataFrame(stsc.transform(df_train_input))
+        df_test_input_ = pd.DataFrame(stsc1.transform(df_test_input))
+
+
+    # ...
+    # Preprocessing Techniques
+    # _____________________________________________________________________________________________________________________
 
     # PCA
     minimum_explained_variance = 0.95
@@ -107,14 +164,11 @@ for j in range(num_repetitions_per_parameter_setting):
 
     pca.fit(df_train_input_)
     principal_components_train = pca.transform(df_train_input_)
+    principal_components_test = pca.transform(df_test_input_)
     number_principal_components = pca.n_components_
     MSE_PCA_train = 1 - pca.explained_variance_ratio_.sum()
 
-    # calculate the PCs for the test data as well
-    principal_components_test = pca.transform(df_test_input_)
-
-    # _______________________________________________________________________________________________________________________
-    # TASK 6: Fisher Discriminant
+    # Fisher Discriminant
     fisher = LinearDiscriminantAnalysis()
     fisher.fit(df_train_input_, df_train_output['class'].values)
     fisher_components_train = fisher.transform(df_train_input_)
@@ -157,8 +211,8 @@ for j in range(num_repetitions_per_parameter_setting):
         if i == 0:
             train_imgs = df_train_input_
             test_imgs = df_test_input_
-            data_type = 'Without'
-            print("Data Without preprocessing")
+            data_type = 'No technique'
+            print("Data Without Techniques")
 
         # Using PCA
         elif i == 1:
@@ -181,36 +235,11 @@ for j in range(num_repetitions_per_parameter_setting):
             data_type = 'Encoder'
             print("Data Using Encoder")
 
-        train_class = df_train_output['class'].values
-        test_class = df_test_output['class'].values
-
-        # Binarized
-        if (j % 2) != 0:
-            fac = 0.99 / 255
-            train_imgs = train_imgs * fac + 0.01
-            test_imgs = test_imgs * fac + 0.01
-
-            # we try the classes in a one-hot representation (binarized):
-            no_classes = 10
-            targets = np.array([train_class]).reshape(-1)
-            train_class_one_hot = np.eye(no_classes)[targets]
-            targets = np.array([test_class]).reshape(-1)
-            test_class_one_hot = np.eye(no_classes)[targets]
-
-            # we don't want zeroes and ones in the labels neither:
-            train_class_one_hot[train_class_one_hot == 0] = 0.01
-            train_class_one_hot[train_class_one_hot == 1] = 0.99
-            test_class_one_hot[test_class_one_hot == 0] = 0.01
-            test_class_one_hot[test_class_one_hot == 1] = 0.99
-
-            train_class = train_class_one_hot
-            test_class = test_class_one_hot
-
         # _______________________________________________________________________________________________________________________
         # TRAIN NN
 
-        filename1 = 'Data/mlp_models/mlp1_model-run_%d-data_%d.sav' %(j,i)
-        filename2 = 'Data/mlp_models/mlp2_model-run_%d-data_%d.sav' %(j,i)
+        filename1 = 'Data/mlp_models/%smlp1_model-run_%d-data_%d.sav' %(type_run,j,i)
+        filename2 = 'Data/mlp_models/%smlp2_model-run_%d-data_%d.sav' %(type_run,j,i)
 
         if train:
             # TRAIN NN
@@ -231,34 +260,45 @@ for j in range(num_repetitions_per_parameter_setting):
             print("\nLoaded File:\n\n"+ filename1 + '\n' + filename2 + '\n' + line_str)
 
         # _______________________________________________________________________________________________________________________
-
-
-        # _______________________________________________________________________________________________________________________
         # PREDICT
 
         # 1st NN
         mlp_labels_pred = mlp1.predict(test_imgs)
-        mlp_results = (test_class == mlp_labels_pred)
-        mlp1_percentage_of_correct_predictions = mlp_results.sum() / len(mlp_results)
+        mlp1_percentage_of_correct_predictions = metrics.accuracy_score(test_class, mlp_labels_pred)
         print("\n1 Layer - 200 neurons" +
               "\nPercentage of correct prediction: " + str(mlp1_percentage_of_correct_predictions))
 
-        # 1st NN
+        # Plot Confusion Matrix
+        cm = confusion_matrix(np.argmax(test_class, axis=1), np.argmax(mlp_labels_pred, axis=1))
+        plot_confusion_matrix(cm, labels)
+        plt.savefig('Data/mlp_models/CM_%smlp1_model-run_%d-data_%d.png' %(type_run,j,i))
+        plt.close()
+
+        # 2nd NN
         mlp2_labels_pred = mlp2.predict(test_imgs)
-        mlp2_results = (test_class == mlp2_labels_pred)
-        mlp2_percentage_of_correct_predictions = mlp2_results.sum() / len(mlp2_results)
+        mlp2_percentage_of_correct_predictions = metrics.accuracy_score(test_class, mlp2_labels_pred)
         print("\n2 Layers - 500|300 neurons" +
-              "\nPercentage of correct prediction: " + str(mlp2_percentage_of_correct_predictions) +
-              "\n" + line_str)
+              "\nPercentage of correct prediction: " + str(mlp2_percentage_of_correct_predictions))
+
+        # Plot Confusion Matrix
+        cm = confusion_matrix(np.argmax(test_class, axis=1), np.argmax(mlp2_labels_pred, axis=1))
+        plot_confusion_matrix(cm, labels)
+        plt.savefig('Data/mlp_models/CM_%smlp2_model-run_%d-data_%d.png' % (type_run, j, i))
+        plt.close()
+
+        end_time = time.time()
+        duration = end_time - start_time
+        print("\nElapsed time: " + str(duration) + ' [Sec]\n' + line_str)
 
         # _______________________________________________________________________________________________________________________
         # store values in Dataframe
-        end_time = time.time()
-        duration = end_time - start_time
-        df_results.loc[pos_count] = [str(j+1), data_type, preprocessing, mlp1_percentage_of_correct_predictions, mlp2_percentage_of_correct_predictions, duration]
+        df_results.loc[pos_count] = [str(j+1), preprocessing, data_type, mlp1_percentage_of_correct_predictions, mlp2_percentage_of_correct_predictions, duration]
         pos_count = pos_count + 1
 
 
 # print results and store to a pickle-file as a basis for later visualization
 print(df_results)
 df_results.to_pickle('Data/mlp_results.pickle')
+
+total_duration = time.time() - total_time
+print("\nTotal elapsed time: "+ str(total_duration) + ' [Sec]\n' + line_str)
