@@ -17,7 +17,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from DataReader import DataReader
+# from DataReader import DataReader
 
 # Parameters for printing outputs
 line_str = "-------------"
@@ -89,24 +89,3 @@ def load_standarized_data(filename):
     df_total, (df_train_input, df_train_output, df_test_input, df_test_output) = load_data(filename)
     df_train_input, df_test_input = standardize(df_train_input, df_test_input)
     return df_total, (df_train_input, df_train_output, df_test_input, df_test_output)
-
-
-def load_standarized_data(filename):
-    trainnumbers = loadmat(filename)
-    _input = np.transpose(trainnumbers['Trainnumbers'][0][0][0])
-    output = np.transpose(trainnumbers['Trainnumbers'][0][0][1])
-
-    #target_scaler = OneHotEncoder(sparse=False, categories='auto')
-    #output = target_scaler.fit_transform(output.reshape(-1, 1))
-
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(
-                                        _input.astype(np.float32),
-                                        output.astype(np.int32),
-                                        test_size=(1 / 8.))
-    scaler = StandardScaler()
-    scaler.fit(X_train)
-    df_train_input = pd.DataFrame(scaler.transform(X_train))
-    df_test_input = pd.DataFrame(scaler.transform(X_test))
-    df_train_output = pd.DataFrame(y_train)
-    df_test_output = pd.DataFrame(y_test)
-    return df_train_input, df_train_output, df_test_input, df_test_output
