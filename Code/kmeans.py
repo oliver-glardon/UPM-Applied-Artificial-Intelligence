@@ -80,7 +80,7 @@ def infer_data_labels(X_labels, cluster_labels):
     return predicted_labels
 
 
-def predict_kme(cluster_labels, df_input, img_class):
+def predict_kme(test_imgs, df_input, img_class):
 
     stsc = Normalizer().fit(df_input)
     df_input_ = pd.DataFrame(stsc.transform(df_input))
@@ -95,29 +95,29 @@ def predict_kme(cluster_labels, df_input, img_class):
     principal_components_train = pca.transform(df_input_)
     no_PCA = pca.n_components_
 
-    # Fisher Discriminant
-    fisher = LinearDiscriminantAnalysis()
-    fisher.fit(df_input_, img_class)
-    fisher_components_train = fisher.transform(df_input_)
-
     # Adding Fisher Discrimant Analysis to PCA
     fisher_pca = LinearDiscriminantAnalysis()
-    fisher_pca.fit(principal_components_train, img_class)
+    train_imgs = fisher_pca.fit(principal_components_train, img_class)
+
 
     if train:
         # FIT K-MEANS
 
-        kmeans = KMeans(n_clusters=n, max_iter=200)
+        kmeans = KMeans(n_clusters=200, max_iter=200)
         kmeans.fit(train_imgs)
+        cluster_labels = infer_cluster_labels(kmeans, img_class)
 
     else:
         # load the model from disk
         filename = 'Data/kme_models/_kmeModel-Cluster200-PCA+FISHER.sav'
         kmeans = joblib.load(filename)
+        filename = 'Data/kme_models/%s_kmeModel-ClusterLabels%d-%s.sav'
+        cluster_labels = joblib.load(filename)
+
 
     # _______________________________________________________________________________________________________________________
     # PREDICT
-    predicted_Cluster = kmeans.predict(train_imgs)
+    predicted_Cluster = kmeans.predict(test_imgs)
     predictions = infer_data_labels(predicted_Cluster, cluster_labels)
 
     return predictions, no_PCA
