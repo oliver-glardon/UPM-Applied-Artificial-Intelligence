@@ -85,10 +85,9 @@ else:
     df_train_input = pd.DataFrame(df_train_set.loc[:, df_train_set.columns != 'class'])
     df_train_output = pd.DataFrame(df_train_set['class'])
     # Load external testing data
-    # todo load external traing data
-    testnumbers = sio.loadmat('Data/Test_numbers.mat')
-    input = testnumbers['Test_numbers'][0][0][0]
-    df_test_input = pd.DataFrame(input.T)
+    testnumbers = sio.loadmat('Data/Test_numbers_HW1.mat')
+    input_ = testnumbers['Test_numbers'][0][0][0]
+    df_test_input = pd.DataFrame(input_.T)
 
 
 #_______________________________________________________________________________________________________________________
