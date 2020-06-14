@@ -36,8 +36,8 @@ df_output = pd.DataFrame(output.T)
 df_total = df_input.copy()
 df_total['class'] = df_output.values # total dataframe containing all data
 
-# Only use 30% of the data to study
-df_total = df_total.groupby('class', group_keys=False).apply(pd.DataFrame.sample, frac=.1)
+# Only use 10% of the data to study
+# df_total = df_total.groupby('class', group_keys=False).apply(pd.DataFrame.sample, frac=.1)
 
 print("Input Dataframe"
       "\nRows: \n  Every row is a data instance (%d)\nColumns:\n  (1) One column 'class' defines the "%df_total.shape[0],
@@ -55,14 +55,14 @@ print(line_str)
 # init_modes_str = ['Inorm', 'Ipca', 'Isample']
 # learning_radiuses = [2,10]
 
-normalized = ['Sin Normalizacion']
+normalized = ['Normalizacion']
 dim_red = ['PCA']
-principal_comps = [100]
+principal_comps = [50]
 grid_sizes = [30]
 list_epochs = [200]
-init_modes = [init.Normal(0, 1), 'init_pca', 'sample_from_data']
-init_modes_str = ['Inorm', 'Ipca', 'Isample']
-learning_radiuses = [10]
+init_modes = ['sample_from_data']
+init_modes_str = ['Isample']
+learning_radiuses = [2]
 
 df_results = pd.DataFrame(columns=['Inicializacion','Numero de LR', 'Numero de Epocas','Dim. Rejilla', 'Normalizacion', 'Metodo reduccion de dimensionalidad', 'Dimensionalidad',
                                    'Precision', 'Tiempo Train'])
