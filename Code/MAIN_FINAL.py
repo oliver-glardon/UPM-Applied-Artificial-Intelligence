@@ -1,10 +1,11 @@
 # Group Information: Intelligencia Artificial Applicada, UPM
 # Emiliano Capogrossi, M18029
-# Oliver Glardon, M19936
+# Oliver Glardon, 19936
 # Sorelys Sandoval, M19237
 #_______________________________________________________________________________________________________________________
 # imports
 import os
+from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
@@ -13,6 +14,8 @@ import time
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
+from knn import predict_knn
+from bayes import predict_bay
 
 # Variables
 names = ['M18029', 'M19936', 'M19237']
@@ -107,14 +110,14 @@ if split_data:
     # ....
     # Plot Confusion Matrix
 
-    cm = confusion_matrix(test_class, kme_predictions)
+    cm = confusion_matrix(test_class, knn_predictions)
     plot_confusion_matrix(cm, labels)
     plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
     plt.close()
 
     # ....
     # Calculate percentages
-    percentage = metrics.accuracy_score(test_class, kme_predictions)
+    percentage = metrics.accuracy_score(test_class, knn_predictions)
 
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
