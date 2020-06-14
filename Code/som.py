@@ -7,56 +7,158 @@
 from utils.functions import *
 import numpy as np
 from scipy import stats
-from utils.som_lib import SOM
-from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
+from neupy import algorithms, utils
+from sklearn.metrics import mean_squared_error
+import pickle
 #_______________________________________________________________________________________________________________________
 # (dataframes) df_total, df_train_input, df_train_output, df_test_input, df_test_output
 df_total, (df_train_input, df_train_output, df_test_input, df_test_output) = load_standarized_data('../Data/Trainnumbers.mat')
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-train_data = df_train_input.to_numpy()
-train_targets = df_train_output.to_numpy().ravel()
-test_targets = df_test_output.to_numpy().ravel()
-test_data = df_test_input.to_numpy()
+
+train_targets = df_train_output.to_numpy(dtype='int').squeeze()
+test_targets = df_test_output.to_numpy(dtype='int').squeeze()
+
+#_______________________________________________________________________________________________________________________
+# Preprocess data
+def preprocess_data(data_to_transform, pca_model=None, n_pca=64, data_train=[]):
+    if not pca_model:
+        pca = PCA(n_pca)
+        if data_train:
+            pca.fit(data_train)
+        else:
+            # If no input data train, fit itself
+            pca.fit(data_to_transform)
+    else:
+        pca = pca_model
+
+    principal_components_res = pca.transform(data_to_transform)
+    number_principal_components = pca.n_components_
+    MSE_PCA_train = 1 - pca.explained_variance_ratio_.sum()
+    print('PCA: ', number_principal_components,MSE_PCA_train)
+    out_data = principal_components_res
+
+    if not pca_model:
+        return out_data, pca
+    else:
+        return out_data
 #_______________________________________________________________________________________________________________________
 
-som = SOM(10, 10)  # initialize the SOM
+def train(train_data, pca_model=None, n_pca=64, grid_size=30, n_epochs=100, plot_flag=False):
+    # Preprocess data if needed
+    if not pca_model:
+        train_data, pca_model = preprocess_data(train_data, n_pca)
+    
+    # Create SOM structure
+    GRID_HEIGHT = grid_size
+    GRID_WIDTH = grid_size
 
-def init(train=False, train_data=train_data):
+    som = algorithms.SOFM(
+        n_inputs=train_data.shape[1],
+        features_grid=(GRID_HEIGHT, GRID_WIDTH),
+
+        learning_radius=5,
+        reduce_radius_after=50,
+
+        step=0.5,
+        std=1,
+
+        shuffle_data=True,
+        verbose=True,
+    )
+
     # Train SOM
-    if train:
-        som.initialize(train_data)
-        som.fit(train_data, 200, save_e=True, interval=100, decay='hill')
-        print("Fit error: %.4f" % som.error)
-    # Load SOM
-    else:
-        som = SOM(30,30)
-        som.load('../Data/modelo_som.p')
-        print("SOM Loaded")
+    som.train(train_data, epochs=n_epochs)
 
-def plot_SOM():
-    # Plot SOM - MAP
-    test_targets = df_test_output.to_numpy().ravel()
-    test_data = df_test_input.to_numpy()
-    som.plot_point_map(df_test_input.to_numpy(), test_targets, labels)
+    # Get model targets for future predictions
+    trained_clusters = som.predict(train_data).argmax(axis=1)
+    som.model_targets = np.zeros([GRID_HEIGHT*GRID_WIDTH,1])
 
-def predict(test_input=test_data):
+    for row_id in range(GRID_HEIGHT):
+        for col_id in range(GRID_WIDTH):
+            index = row_id * GRID_HEIGHT + col_id
+            indices = np.argwhere(trained_clusters == index).ravel()
+            clustered_targets = train_targets[indices]
+
+            if len(clustered_targets) > 0:
+                # Select the target mode
+                target = stats.mode(clustered_targets).mode[0]
+            else:
+                # If no prediction, assume 0
+                target = 0
+            som.model_targets[index] = target
+
+    # Compute training MSE
+    som_predictions = som.model_targets[trained_clusters]
+    som.mse = mean_squared_error(train_targets, som_predictions)
+    print('SOM train MSE: ', mse)
+
+    # Save model
+    som.pca_model = pca_model
+    save_som('../Data/som/som_S%d_E%d_C%d.p', som)
+
+    # Plot SOM map
+    if plot_flag:
+        plot_SOM(som, train_data, train_targets)
+
+    return som
+
+def plot_SOM(som, train_data, train_targets):
+    # PLot SOM map
+    clusters = som.predict(train_data).argmax(axis=1)
+
+    fig = plt.figure(figsize=(12, 12))
+
+    som_predictions = np.zeros([train_targets.size,1])
+    images = df_train_input.to_numpy()
+    colors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff', '#000000']
+
+    grid = gridspec.GridSpec(GRID_HEIGHT, GRID_WIDTH)
+    grid.update(wspace=0, hspace=0)
+    for row_id in range(GRID_HEIGHT):
+        for col_id in range(GRID_WIDTH):
+            index = row_id * GRID_HEIGHT + col_id
+            indices = np.argwhere(clusters == index).ravel()
+            clustered_samples = images[indices]
+            clustered_targets = train_targets[indices]
+
+            if len(clustered_samples) > 0:
+                # We take the first sample, but it can be any
+                # sample from this cluster
+                sample = np.mean(clustered_samples,0)
+                target = stats.mode(clustered_targets).mode[0]
+            else:
+                # If we don't have samples in cluster then
+                # it means that there is a gap in space
+                sample = np.zeros(784)
+                target = -1
+            som_predictions[indices] = target
+
+            ax = plt.subplot(grid[index])
+            plt.setp(ax.spines.values(), color=colors[target], visible=True, linewidth=2)
+            plt.imshow(sample.reshape((28, 28)), cmap='Greys')
+            ax.set_xticks([])
+            ax.set_yticks([])
+    plt.show()
+    return fig
+
+def predict_som(eval_data, som=None, model_filename='../Data/som_models/som_S30_E200_C278_A86.p'):
+    # Load model
+    if not som:
+        with open(model_filename, 'rb') as f:
+            som = pickle.load(f)
+            print("SOM Loaded")
+
+    # Preprocess data if needed
+    if eval_data.shape[1] != som.n_inputs:
+        eval_data = preprocess_data(eval_data, pca_model=som.pca_model)
+    
     # Evaluate SOM with test data
-    som_output = []
-    som.winner_neurons(df_test_input)
-    som.winner_indices
-
-    for i,digit in enumerate(test_data):
-        som_estimations = som.get_neighbors(digit, train_data, train_targets)
-        som_output.append(stats.mode(som_estimations).mode[0])
-        # display_number(digit)
-    return som_output
-
-def plot_confusion_matrix(test_targets, som_output):
-    # Plot Confusion Matrix
-    cm = confusion_matrix(test_targets, som_output)
-    plot_confusion_matrix(cm, labels)
+    eval_clusters = som.predict(eval_data).argmax(axis=1)
+    predictions = som.model_targets[eval_clusters]
+    return som.n_inputs, predictions
 
 if __name__=='__main__':
     print('SOM main:\n Loading Model and Data')
     init()
+    print(predict())
