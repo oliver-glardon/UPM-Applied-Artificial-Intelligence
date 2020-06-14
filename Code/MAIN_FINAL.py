@@ -16,6 +16,7 @@ from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
 from knn import predict_knn
 from bayes import predict_bay
+from som import load_som_model, predict_som
 
 # Variables
 names = ['M18029', '19936', 'M19237']
@@ -112,7 +113,7 @@ if split_data:
 
     cm = confusion_matrix(test_class, knn_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/CM_%s.png' %(technique))
+    plt.savefig('Data/Output/CM_%s.png' %(technique))
     plt.close()
 
     # ....
@@ -128,7 +129,7 @@ if split_data:
 print("Export results for algorithm: " + technique + "\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
+    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -154,7 +155,7 @@ if split_data:
 
     cm = confusion_matrix(test_class, bay_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/CM_%s.png' %(technique))
+    plt.savefig('Data/Output/CM_%s.png' %(technique))
     plt.close()
 
     # ....
@@ -170,7 +171,46 @@ if split_data:
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
+    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
+
+
+#_______________________________________________________________________________________________________________________
+# SOM
+# ....
+
+technique = 'som'
+som = load_som_model('Data/som_models/som_S30_E200_C100_A92.p')
+start_time = time.time()
+
+#Function
+som_predictions, no_PCA = predict_som(df_test_input, som)
+
+runtime_som = time.time() - start_time
+
+#
+if split_data:
+    # ....
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, som_predictions)
+    plot_confusion_matrix(cm, labels)
+    plt.savefig('Data/Output/CM_%s.png' %(technique))
+    plt.close()
+
+    # ....
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, som_predictions)
+
+    percentage_of_correct_predictions.append(percentage)
+    running_time.append(runtime_knn)
+# ....
+# Code to convert the results to a matlab file specified in the homework description
+
+print("Export results for algorithm: "+ technique +"\n" + line_str)
+
+for name in names:
+    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions)})
+
 
 
 #_______________________________________________________________________________________________________________________
@@ -196,7 +236,7 @@ if split_data:
 
     cm = confusion_matrix(test_class, mlp_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.savefig('Data/Output/CM_%s.png' %(technique))
     plt.close()
 
     # ....
@@ -212,48 +252,7 @@ if split_data:
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
-
-
-#_______________________________________________________________________________________________________________________
-# SOM
-# ....
-
-technique = 'som'
-start_time = time.time()
-
-#Params
-param_1 = df_train_input
-param_2 = df_train_output
-
-#Function
-som_predictions, no_PCA = predict_som(df_test_input, param_1, param_2)
-
-runtime_som = time.time() - start_time
-
-#
-if split_data:
-    # ....
-    # Plot Confusion Matrix
-
-    cm = confusion_matrix(test_class, som_predictions)
-    plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
-    plt.close()
-
-    # ....
-    # Calculate percentages
-    percentage = metrics.accuracy_score(test_class, som_predictions)
-
-    percentage_of_correct_predictions.append(percentage)
-    running_time.append(runtime_knn)
-# ....
-# Code to convert the results to a matlab file specified in the homework description
-
-print("Export results for algorithm: "+ technique +"\n" + line_str)
-
-for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions.values)})
+    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -279,7 +278,7 @@ if split_data:
 
     cm = confusion_matrix(test_class, kme_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.savefig('Data/Output/CM_%s.png' %(technique))
     plt.close()
 
     # ....
@@ -295,7 +294,7 @@ if split_data:
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
+    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
 
 #_______________________________________________________________________________________________________________________
 # Graphics
