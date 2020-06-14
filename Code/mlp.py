@@ -25,8 +25,10 @@ import joblib
 
 train = False
 
-def predict_mlp(test_input, test_output, df_input, img_class):
 
+def predict_mlp(test_input, test_output, df_input, img_class):
+    img_class=img_class.values
+    test_output=test_output.values
     # One-Hot
     target_scaler = OneHotEncoder(sparse=False, categories='auto')
     img_class = target_scaler.fit_transform(img_class.reshape(-1, 1))
