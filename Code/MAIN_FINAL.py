@@ -1,10 +1,11 @@
 # Group Information: Intelligencia Artificial Applicada, UPM
 # Emiliano Capogrossi, M18029
-# Oliver Glardon, M19936
+# Oliver Glardon, 19936
 # Sorelys Sandoval, M19237
 #_______________________________________________________________________________________________________________________
 # imports
 import os
+from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
@@ -12,6 +13,8 @@ import pandas as pd
 import time
 from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
+from knn import predict_knn
+from bayes import predict_bay
 
 # Variables
 names = ['M18029', 'M19936', 'M19237']
@@ -104,12 +107,12 @@ if split_data:
     # ....
     # Plot Confusion Matrix
 
-    cm = confusion_matrix(test_class, kme_predictions)
+    cm = confusion_matrix(df_test_output, knn_predictions)
     plot_confusion_matrix(cm, labels)
 
     # ....
     # Calculate percentage of correct predictions
-    alg_results = (test_class == kme_predictions)
+    alg_results = (df_test_output == knn_predictions)
     percentage = alg_results.sum() / len(alg_results)
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
@@ -143,12 +146,12 @@ if split_data:
     # ....
     # Plot Confusion Matrix
 
-    cm = confusion_matrix(test_class, bay_predictions)
+    cm = confusion_matrix(df_test_output, bay_predictions)
     plot_confusion_matrix(cm, labels)
 
     # ....
     # Calculate percentage of correct predictions
-    alg_results = (test_class == bay_predictions)
+    alg_results = (df_test_output == bay_predictions)
     percentage = alg_results.sum() / len(alg_results)
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_bay)
