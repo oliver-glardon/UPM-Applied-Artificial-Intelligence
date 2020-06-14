@@ -110,14 +110,14 @@ if split_data:
     # ....
     # Plot Confusion Matrix
 
-    cm = confusion_matrix(test_class, kme_predictions)
+    cm = confusion_matrix(test_class, knn_predictions)
     plot_confusion_matrix(cm, labels)
     plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
     plt.close()
 
     # ....
     # Calculate percentages
-    percentage = metrics.accuracy_score(test_class, kme_predictions)
+    percentage = metrics.accuracy_score(test_class, knn_predictions)
 
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
