@@ -18,7 +18,7 @@ from knn import predict_knn
 from bayes import predict_bay
 
 # Variables
-names = ['M18029', 'M19936', 'M19237']
+names = ['M18029', '19936', 'M19237']
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 techniques = ('KNN', 'BAYES','MLP', 'SOM', 'K-MEANS')
 running_time = []
@@ -112,7 +112,7 @@ if split_data:
 
     cm = confusion_matrix(test_class, knn_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.savefig('Data/CM_%s.png' %(technique))
     plt.close()
 
     # ....
@@ -129,6 +129,7 @@ print("Export results for algorithm: " + technique + "\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
+
 
 #_______________________________________________________________________________________________________________________
 # Bayesian Classifiers
@@ -153,7 +154,7 @@ if split_data:
 
     cm = confusion_matrix(test_class, bay_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/mlp_models/CM_%s.png' %(technique))
+    plt.savefig('Data/CM_%s.png' %(technique))
     plt.close()
 
     # ....
@@ -170,6 +171,7 @@ print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
+
 
 #_______________________________________________________________________________________________________________________
 # MLP
@@ -294,7 +296,6 @@ print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
     sio.savemat('Data/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
-
 
 #_______________________________________________________________________________________________________________________
 # Graphics

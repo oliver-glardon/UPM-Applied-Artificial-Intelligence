@@ -1,7 +1,7 @@
 #_______________________________________________________________________________________________________________________
 # imports
 from sklearn.decomposition import PCA
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import Binarizer
 import pandas as pd
 
@@ -38,7 +38,7 @@ def predict_bay(df_test_input, param_1, param_2):
     principal_components_test = abs(lowest_num) + principal_components_test
 
     # Bayes
-    bayes = MultinomialNB()
+    bayes = GaussianNB()
     bayes.fit(principal_components_train, df_train_output['class'].values)
     bayes_labels_pred = pd.DataFrame(bayes.predict(principal_components_test))
     return bayes_labels_pred, number_principal_components
