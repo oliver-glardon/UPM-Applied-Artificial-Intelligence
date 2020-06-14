@@ -60,7 +60,7 @@ print(line_str)
 
 #_______________________________________________________________________________________________________________________
 # CHOOSE DATA USAGE TYPE
-split_data = True
+split_data = False
 
 # CASE 1: split into training and testing data
 if split_data:
@@ -85,9 +85,10 @@ else:
     df_train_input = pd.DataFrame(df_train_set.loc[:, df_train_set.columns != 'class'])
     df_train_output = pd.DataFrame(df_train_set['class'])
     # Load external testing data
+    # todo load external traing data
     testnumbers = sio.loadmat('Data/Test_numbers_HW1.mat')
-    input_ = testnumbers['Test_numbers'][0][0][0]
-    df_test_input = pd.DataFrame(input_.T)
+    input = testnumbers['Test_numbers'][0][0][0]
+    df_test_input = pd.DataFrame(input.T)
 
 
 #_______________________________________________________________________________________________________________________
