@@ -1,8 +1,10 @@
-# Group Information: Intelligencia Artificial Applicada, UPM
+# Group Information: Inteligencia Artificial Applicada, UPM
+# .....
 # Emiliano Capogrossi, M18029
 # Oliver Glardon, 19936
 # Sorelys Sandoval, M19237
-#_______________________________________________________________________________________________________________________
+# .....
+# _______________________________________________________________________________________________________________________
 # imports
 import os
 from scipy.io import loadmat
@@ -16,6 +18,8 @@ from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
 from knn import predict_knn
 from bayes import predict_bay
+from mlp import predict_mlp
+from kmeans import predict_kme
 from som import load_som_model, predict_som
 
 # Variables
@@ -220,12 +224,9 @@ for name in names:
 technique = 'mlp'
 start_time = time.time()
 
-#Params
-param_1 = df_train_input
-param_2 = df_train_output
 
 #Function
-mlp_predictions, no_PCA = predict_mlp(df_test_input, param_1, param_2)
+mlp_predictions, no_PCA = predict_mlp(df_test_input, df_test_output, df_train_input, df_train_output)
 
 runtime_mlp = time.time() - start_time
 
