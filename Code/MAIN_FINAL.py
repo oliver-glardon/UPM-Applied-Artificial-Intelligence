@@ -60,7 +60,7 @@ print(line_str)
 
 #_______________________________________________________________________________________________________________________
 # CHOOSE DATA USAGE TYPE
-split_data = True
+split_data = False
 
 # CASE 1: split into training and testing data
 if split_data:
@@ -86,7 +86,7 @@ else:
     df_train_output = pd.DataFrame(df_train_set['class'])
     # Load external testing data
     # todo load external traing data
-    testnumbers = sio.loadmat('Data/Test_numbers.mat')
+    testnumbers = sio.loadmat('Data/Test_numbers_HW1.mat')
     input = testnumbers['Test_numbers'][0][0][0]
     df_test_input = pd.DataFrame(input.T)
 
@@ -253,7 +253,7 @@ if split_data:
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
+    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions)})
 
 
 #_______________________________________________________________________________________________________________________
