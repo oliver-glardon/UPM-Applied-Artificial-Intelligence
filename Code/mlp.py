@@ -18,12 +18,12 @@ from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
 import matplotlib.pyplot as plt
 from neupy import algorithms, layers
-
+import pickle
 import pandas as pd
 import time
 import joblib
 
-train = True
+train = False
 
 
 def predict_mlp(test_input, test_output, df_input, img_class):
@@ -38,12 +38,15 @@ def predict_mlp(test_input, test_output, df_input, img_class):
     img_class = target_scaler.fit_transform(img_class.reshape(-1, 1))
     test_class = target_scaler.fit_transform(test_output.reshape(-1, 1))
 
-    stsc = Normalizer().fit(df_input)
+    stsc = StandardScaler().fit(df_input)
+    stsc1 = StandardScaler().fit(test_input)
     df_input_ = pd.DataFrame(stsc.transform(df_input))
-    df_test_input_ = pd.DataFrame(stsc.transform(test_input))
-    stsc = StandardScaler().fit(df_input_)
+    test_input_ = pd.DataFrame(stsc1.transform(test_input))
+
+    stsc = Binarizer().fit(df_input_)
+    stsc1 = Binarizer().fit(test_input_)
     df_input_ = pd.DataFrame(stsc.transform(df_input_))
-    df_test_input_ = pd.DataFrame(stsc.transform(df_test_input_))
+    test_input_ = pd.DataFrame(stsc1.transform(test_input_))
 
     # PCA
     number_principal_components = 100
@@ -51,7 +54,7 @@ def predict_mlp(test_input, test_output, df_input, img_class):
 
     pca.fit(df_input_)
     principal_components_train = pca.transform(df_input_)
-    principal_components_test = pca.transform(df_test_input_)
+    principal_components_test = pca.transform(test_input_)
     no_PCA = pca.n_components_
 
     train_imgs = principal_components_train
@@ -91,8 +94,9 @@ def predict_mlp(test_input, test_output, df_input, img_class):
 
     else:
         # load the model from disk
-        filename = 'Data/mlp_models/NEUPY_mlp2_model-run_2-data_2.sav'
-        mlp2 = joblib.load(filename)
+        filename = 'Data/mlp_models/NEUPY_BIN_mlp2_model-run_2-data_1.pickle'
+        with open(filename, 'rb') as f:
+            mlp2 = pickle.load(f)
 
     # _______________________________________________________________________________________________________________________
     # PREDICT
