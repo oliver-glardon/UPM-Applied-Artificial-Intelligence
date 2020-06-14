@@ -8,20 +8,13 @@ from utils.functions import *
 import numpy as np
 from scipy import stats
 from utils.plot_cm import plot_confusion_matrix
-from neupy import algorithms, utils
-from sklearn.metrics import mean_squared_error
+from neupy import algorithms, utils, init
+from sklearn.metrics import mean_squared_error, accuracy_score
 import pickle
-#_______________________________________________________________________________________________________________________
-# (dataframes) df_total, df_train_input, df_train_output, df_test_input, df_test_output
-df_total, (df_train_input, df_train_output, df_test_input, df_test_output) = load_standarized_data('../Data/Trainnumbers.mat')
-labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-
-train_targets = df_train_output.to_numpy(dtype='int').squeeze()
-test_targets = df_test_output.to_numpy(dtype='int').squeeze()
 
 #_______________________________________________________________________________________________________________________
 # Preprocess data
-def preprocess_data(data_to_transform, pca_model=None, n_pca=64, data_train=[]):
+def preprocess_data(data_to_transform, pca_model=None, n_pca=100, data_train=[]):
     if pca_model is None:
         pca = PCA(n_pca)
         if data_train:
@@ -42,10 +35,22 @@ def preprocess_data(data_to_transform, pca_model=None, n_pca=64, data_train=[]):
     else:
         return out_data
 #_______________________________________________________________________________________________________________________
-
-def train(train_data, pca_model=None, n_pca=64, grid_size=30, n_epochs=100, plot_flag=False):
+# BORRARRRR
+# Para entrenar sin normalizar no envies pca
+def train_som(train_data, train_targets, 
+          grid_size=30, 
+          n_epochs=100, 
+          lrn_radius=2,
+          init_mode=init.Normal(0, 1),
+          pca_model=None, n_pca=None, 
+          plot_flag=False, 
+          extra_str='', dir_path='../Data/som_models/'):
     # Preprocess data if needed
-    if pca_model is None:
+    if type(train_data)=='pandas.core.frame.DataFrame':
+        train_data = train_data.to_numpy()
+    if type(train_targets)=='pandas.core.frame.DataFrame':
+        train_targets = train_targets.to_numpy(dtype='int').squeeze()
+    if pca_model is None and n_pca is not None:
         train_data, pca_model = preprocess_data(train_data, n_pca)
     
     # Create SOM structure
@@ -56,7 +61,8 @@ def train(train_data, pca_model=None, n_pca=64, grid_size=30, n_epochs=100, plot
         n_inputs=train_data.shape[1],
         features_grid=(GRID_HEIGHT, GRID_WIDTH),
 
-        learning_radius=5,
+        learning_radius=lrn_radius,
+        weight=init_mode,
         reduce_radius_after=50,
 
         step=0.5,
@@ -90,12 +96,14 @@ def train(train_data, pca_model=None, n_pca=64, grid_size=30, n_epochs=100, plot
     # Compute training MSE
     som_predictions = model_targets[trained_clusters]
     som.mse = mean_squared_error(train_targets, som_predictions)
-    print('SOM train MSE: ', mse)
+    accuracy = accuracy_score(train_targets, som_predictions)
+    print('SOM train MSE: ', som.mse)
+    print('SOM train Acc: ', accuracy)
 
     # Save model
     som.model_targets = model_targets.squeeze()
     som.pca_model = pca_model
-    save_som(som, 'MSE%d'%som.mse)
+    save_som_model(som, extra_str, dir_path)
 
     # Plot SOM map
     if plot_flag:
@@ -103,16 +111,16 @@ def train(train_data, pca_model=None, n_pca=64, grid_size=30, n_epochs=100, plot
 
     return som
 
-def plot_SOM(som, train_data, train_targets):
+def plot_som(som, train_data, train_targets):
     # PLot SOM map
     clusters = som.predict(train_data).argmax(axis=1)
 
     fig = plt.figure(figsize=(12, 12))
 
     som_predictions = np.zeros([train_targets.size,1])
-    images = df_train_input.to_numpy()
+    images = train_data
     colors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff', '#000000']
-
+    [GRID_HEIGHT, GRID_WIDTH] =  som.features_grid
     grid = gridspec.GridSpec(GRID_HEIGHT, GRID_WIDTH)
     grid.update(wspace=0, hspace=0)
     for row_id in range(GRID_HEIGHT):
@@ -147,10 +155,13 @@ def load_som_model(model_filename='../Data/som_models/som_S30_E200_C100_A92.p'):
         som = pickle.load(f)
         return som
 
-def save_som_model(som, extra_str=''):
-    dir_path = '../Data/som_models/'
-    name = 'som_S%d_E%d_C%d_%s.p'%(som.features_grid[0], som.n_updates_made, som.n_inputs, extra_str)
-    with open(dir_path+name, 'wb') as f:
+def save_som_model(som, extra_str='', dir_path='../Data/som_models/'):
+    name = 'som_S%d_E%d_C%d_LR%d_%s.p'%(som.features_grid[0], 
+                                        som.n_updates_made, 
+                                        som.n_inputs, 
+                                        som.learning_radius, 
+                                        extra_str)
+    with open(dir_path+name, 'wb+') as f:
         pickle.dump(som, f)
 
 def predict_som(eval_data, som=None, model_filename='../Data/som_models/som_S30_E200_C100_A92.p'):
@@ -159,7 +170,12 @@ def predict_som(eval_data, som=None, model_filename='../Data/som_models/som_S30_
 
     # Preprocess data if needed
     if eval_data.shape[1] != som.n_inputs:
-        eval_data = preprocess_data(eval_data, pca_model=som.pca_model)
+        if som.pca_model is not None:
+            eval_data = preprocess_data(eval_data, pca_model=som.pca_model)
+        else:
+            print("""Sorry, SOM model input number does not match with evaluation data. 
+                    Please associate a som.pca_model of %d number of components"""%som.n_inputs)
+            return [], 0
     
     # Evaluate SOM with test data
     eval_clusters = som.predict(eval_data).argmax(axis=1)
