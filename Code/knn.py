@@ -2,6 +2,7 @@
 # imports
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
+import pandas as pd
 
 #_______________________________________________________________________________________________________________________
 # Prediction method for knn
@@ -22,9 +23,8 @@ def predict_knn(df_test_input, param_1, param_2):
     principal_components_test = pca.transform(df_test_input)
 
     # Knn
-    print("k-nearest neighbors")
     num_neighbors = 5
     knn = KNeighborsClassifier(n_neighbors=num_neighbors)
     knn.fit(principal_components_train, df_train_output['class'].values)
-    knn_labels_pred = knn.predict(principal_components_test)
+    knn_labels_pred = pd.DataFrame(knn.predict(principal_components_test))
     return knn_labels_pred, number_principal_components

@@ -8,7 +8,7 @@ import pandas as pd
 #_______________________________________________________________________________________________________________________
 # Prediction method for bayes
 
-def predict_bayes(df_test_input, param_1, param_2):
+def predict_bay(df_test_input, param_1, param_2):
 
     df_train_input = param_1
     df_train_output = param_2
@@ -34,11 +34,11 @@ def predict_bayes(df_test_input, param_1, param_2):
         lowest_num = principal_components_test.min()
     else:
         lowest_num = principal_components_train.min()
-    principal_components_train = (-lowest_num)+principal_components_train
-    principal_components_test = (-lowest_num) + principal_components_test
+    principal_components_train = abs(lowest_num)+principal_components_train
+    principal_components_test = abs(lowest_num) + principal_components_test
 
     # Bayes
     bayes = MultinomialNB()
     bayes.fit(principal_components_train, df_train_output['class'].values)
-    bayes_labels_pred = bayes.predict(principal_components_test)
+    bayes_labels_pred = pd.DataFrame(bayes.predict(principal_components_test))
     return bayes_labels_pred, number_principal_components
