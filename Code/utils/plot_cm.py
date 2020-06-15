@@ -1,4 +1,3 @@
-# Taken from: https://www.kaggle.com/grfiv4/plot-a-confusion-matrix
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
@@ -7,7 +6,8 @@ def plot_confusion_matrix(cm,
                           target_names,
                           title='Confusion matrix',
                           cmap=None,
-                          normalize=True):
+                          normalize=True,
+                          savePath=[]):
     """
     given a sklearn confusion matrix (cm), make a nice plot
 
@@ -75,5 +75,7 @@ def plot_confusion_matrix(cm,
 
     plt.tight_layout()
     plt.ylabel('True label')
-    plt.xlabel('Predicted label\naccuracy={:0.2f}; misclass={:0.2f}'.format(100*accuracy, 100*misclass))
-    plt.show(block=False)
+    plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+
+    if savePath!=[]:
+        plt.savefig(savePath)
