@@ -60,7 +60,7 @@ print(line_str)
 
 #_______________________________________________________________________________________________________________________
 # CHOOSE DATA USAGE TYPE
-split_data = False
+split_data = True
 
 if split_data:
     tag="Output/"
@@ -342,7 +342,7 @@ if split_data:
     plt.bar(y_pos, percentage_of_correct_predictions, color=(0.2, 0.4, 0.6, 0.6))
     plt.xticks(y_pos, techniques)
     plt.savefig('Data/%sPercentages.png'%(tag), bbox_inches='tight' )
-
+    plt.close()
 # Graphic Bar Time Elapse
 # ....
 
@@ -350,7 +350,7 @@ y_pos = np.arange(len(techniques))
 plt.bar(y_pos, running_time, color=(0.2, 0.4, 0.6, 0.6))
 plt.xticks(y_pos, techniques)
 plt.savefig('Data/%sRuntimes.png'%(tag), bbox_inches='tight' )
-
+plt.close()
 #_______________________________________________________________________________________________________________________
 # Result table
 # ....
