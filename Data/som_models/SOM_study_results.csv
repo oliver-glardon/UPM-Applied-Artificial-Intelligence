@@ -1,0 +1,34 @@
+﻿Inicializacion,Numero de LR,Numero de Epocas,Dim. Rejilla,Normalizacion,Metodo reduccion de dimensionalidad,Dimensionalidad,Precision,Tiempo Train,tiempo (min)
+Normal,2,200,30,Normalizacion,PCA,50,94.3,653.8114729,10.89685788
+Muestras aleatorias,2,200,30,Normalizacion,PCA,50,93.1,586.267822,9.771130367
+PCA,2,200,30,Normalizacion,PCA,50,92.8,601.5705056,10.02617509
+Normal,2,200,30,Sin Normalizacion,PCA,100,92.7,969.7501676,16.16250279
+Normal,2,200,30,Normalizacion,PCA,100,92.55,939.1677711,15.65279619
+Muestras aleatorias,2,200,10,Sin Normalizacion,PCA,56,86.5,45.34955072,0.755825845
+Normal,2,200,10,Sin Normalizacion,PCA,56,84,44.01354432,0.733559072
+PCA,2,200,10,Sin Normalizacion,PCA,56,83,44.53860712,0.742310119
+PCA,2,100,10,Sin Normalizacion,PCA,56,82,22.20272207,0.370045368
+Normal,2,100,10,Sin Normalizacion,PCA,56,79.5,26.77389526,0.446231588
+Normal,10,200,10,Sin Normalizacion,PCA,56,71.5,52.47729301,0.87462155
+PCA,10,200,10,Sin Normalizacion,PCA,56,69,51.49749088,0.858291515
+Muestras aleatorias,10,200,10,Sin Normalizacion,PCA,56,67,51.64578843,0.860763141
+Normal,10,200,30,Sin Normalizacion,PCA,100,62.5,116.3185399,1.938642331
+Normal,2,100,30,Sin Normalizacion,PCA,56,62,31.97676182,0.53294603
+PCA,10,200,30,Sin Normalizacion,PCA,100,60.5,100.9511693,1.682519488
+Normal,2,200,30,Normalizacion,PCA,100,58.5,79.711303,1.328521717
+Muestras aleatorias,10,200,30,Sin Normalizacion,PCA,100,56,91.9138875,1.531898125
+Normal,2,100,30,Sin Normalizacion,PCA,128,55.5,49.18190503,0.819698417
+Normal,2,100,10,Sin Normalizacion,Fisher,100,55,22.71024323,0.378504054
+Normal,2,100,10,Normalizacion & Binarizacion,Fisher,100,53,21.03514004,0.350585667
+Normal,2,200,30,Sin Normalizacion,PCA,100,50,78.19363976,1.303227329
+Normal,2,100,30,Sin Normalizacion,Fisher,100,48.5,26.92145228,0.448690871
+Normal,2,100,10,Normalizacion,Fisher,100,48.5,21.29234982,0.354872497
+Normal,10,100,10,Sin Normalizacion,Fisher,100,47,22.44438291,0.374073048
+Normal,10,100,10,Normalizacion,Fisher,100,47,23.12714624,0.385452437
+Normal,2,200,30,Binarizacion,PCA,100,47,79.65380573,1.327563429
+Normal,2,200,30,Sin Normalizacion,PCA,128,46,91.56524396,1.526087399
+Normal,2,100,30,Normalizacion,Fisher,100,45,26.07592535,0.434598756
+Normal,10,100,10,Normalizacion & Binarizacion,Fisher,100,44,27.31050086,0.455175014
+Normal,2,200,30,Normalizacion & Binarizacion,PCA,100,44,76.64002466,1.277333744
+Normal,10,100,30,Sin Normalizacion,Fisher,100,39.5,27.42663336,0.457110556
+Normal,10,100,30,Normalizacion,Fisher,100,39.5,32.16988182,0.536164697
