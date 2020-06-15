@@ -129,7 +129,8 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, knn_predictions)
-    print("Porcentaje acierto: %d %%\n" %(str(percentage*100)))
+    
+    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
@@ -173,8 +174,8 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, bay_predictions)
-
-    print("Porcentaje acierto: %d %%\n" %(str(percentage*100)))
+    
+    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_bay)
 
@@ -215,7 +216,7 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, som_predictions)
-    print("Porcentaje acierto: %d %%\n" % (str(percentage * 100)))
+    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 # ....
@@ -256,7 +257,7 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, mlp_predictions)
-    print("Porcentaje acierto: %d %%\n" % (str(percentage * 100)))
+    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_mlp)
 
@@ -302,7 +303,7 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, kme_predictions)
-    print("Porcentaje acierto: %d %%\n" % (str(percentage * 100)))
+    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
