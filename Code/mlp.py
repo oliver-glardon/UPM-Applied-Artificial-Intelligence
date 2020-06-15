@@ -23,9 +23,6 @@ import pandas as pd
 import time
 import joblib
 
-train = False
-
-
 def predict_mlp(test_input, test_output, df_input, img_class):
 
     test_input /= 255.
@@ -47,7 +44,7 @@ def predict_mlp(test_input, test_output, df_input, img_class):
     test_input_ = pd.DataFrame(stsc1.transform(test_input_))
 
     # PCA
-    number_principal_components = 100
+    number_principal_components = 250
     pca = PCA(n_components=number_principal_components)
 
     pca.fit(df_input_)
@@ -58,43 +55,13 @@ def predict_mlp(test_input, test_output, df_input, img_class):
     train_imgs = principal_components_train
     test_imgs = principal_components_test
 
-    if train:
-        # FIT K-MEANS
 
-        mlp2 = algorithms.Momentum(
-            [
-                layers.Input(len(train_imgs[0])),
-                layers.Relu(500),
-                layers.Relu(300),
-                layers.Softmax(10),
-            ],
+    # _______________________________________________________________________________________________________________________
+    # load the model from disk
 
-            # Using categorical cross-entropy as a loss function.
-            # It's suitable for classification with 3 and more classes.
-            loss='categorical_crossentropy',
-
-            # Learning rate
-            step=0.01,
-
-            # Shows information about algorithm and
-            # training progress in terminal
-            verbose=False,
-
-            # Randomly shuffles training dataset before every epoch
-            shuffle_data=True,
-
-            momentum=0.99,
-            # Activates Nesterov momentum
-            nesterov=True,
-        )
-
-        mlp2.train(train_imgs, img_class, test_imgs, test_class, epochs=50)
-
-    else:
-        # load the model from disk
-        filename = 'Data/mlp_models/NEUPY_BIN_mlp2_model-run_2-data_1.pickle'
-        with open(filename, 'rb') as f:
-            mlp2 = pickle.load(f)
+    filename = 'Data/mlp_models/_mlp2_model-PCA250-NSB.pickle'
+    with open(filename, 'rb') as f:
+        mlp2 = pickle.load(f)
 
     # _______________________________________________________________________________________________________________________
     # PREDICT
