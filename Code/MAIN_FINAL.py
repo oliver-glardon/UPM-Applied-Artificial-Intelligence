@@ -63,7 +63,7 @@ print(line_str)
 split_data = True
 
 if split_data:
-    tag="TRAIN_"
+    tag="Study/"
 else:
     tag=""
 
@@ -122,7 +122,8 @@ if split_data:
 
     cm = confusion_matrix(test_class, knn_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/Output/CM_%s.png' %(technique))
+    
+    plt.savefig('Data/Output/%sCM_%s.png' %(tag,technique))
     plt.close()
 
     # ....
@@ -138,7 +139,7 @@ if split_data:
 print("Export results for algorithm: " + technique + "\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
+    sio.savemat('Data/Output/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -165,7 +166,8 @@ if split_data:
 
     cm = confusion_matrix(test_class, bay_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/Output/CM_%s.png' %(technique))
+    
+    plt.savefig('Data/Output/%sCM_%s.png' %(tag,technique))
     plt.close()
 
     # ....
@@ -182,7 +184,7 @@ if split_data:
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
+    sio.savemat('Data/Output/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -206,7 +208,8 @@ if split_data:
 
     cm = confusion_matrix(test_class, som_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/Output/CM_%s.png' %(technique))
+    
+    plt.savefig('Data/Output/%sCM_%s.png' %(tag,technique))
     plt.close()
 
     # ....
@@ -221,7 +224,7 @@ if split_data:
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions)})
+    sio.savemat('Data/Output/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions)})
 
 
 
@@ -246,7 +249,8 @@ if split_data:
 
     cm = confusion_matrix(test_class, mlp_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/Output/CM_%s.png' %(technique))
+    
+    plt.savefig('Data/Output/%sCM_%s.png' %(tag,technique))
     plt.close()
 
     # ....
@@ -291,7 +295,8 @@ if split_data:
 
     cm = confusion_matrix(test_class, kme_predictions)
     plot_confusion_matrix(cm, labels)
-    plt.savefig('Data/Output/CM_%s.png' %(technique))
+    
+    plt.savefig('Data/Output/%sCM_%s.png' %(tag,technique))
     plt.close()
 
     # ....
@@ -307,7 +312,7 @@ if split_data:
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
+    sio.savemat('Data/Output/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions.values)})
 
 #_______________________________________________________________________________________________________________________
 # Graphics
@@ -319,7 +324,7 @@ if split_data:
     y_pos = np.arange(len(techniques))
     plt.bar(y_pos, percentage_of_correct_predictions, color=(0.2, 0.4, 0.6, 0.6))
     plt.xticks(y_pos, techniques)
-    plt.show()
+    plt.savefig('Data/Output/%sPorcentaje Aciertos.png' %(tag))
 
 # Graphic Bar Time Elapse
 # ....
@@ -327,7 +332,7 @@ if split_data:
 y_pos = np.arange(len(techniques))
 plt.bar(y_pos, running_time, color=(0.2, 0.4, 0.6, 0.6))
 plt.xticks(y_pos, techniques)
-plt.show()
+plt.savefig('Data/Output/%sTiempo transcurrido.png' %(tag))
 
 #_______________________________________________________________________________________________________________________
 # Result table
