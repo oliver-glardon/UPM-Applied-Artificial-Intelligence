@@ -62,10 +62,14 @@ print(line_str)
 # CHOOSE DATA USAGE TYPE
 split_data = False
 
+if split_data:
+    tag="Output/"
+else:
+    tag="OutputFinalTest/"
+
 # CASE 1: split into training and testing data
 if split_data:
     print("Split into training and testing data\n" + line_str)
-    output_folder = 'Data/Output/'
     # Split into training and testing data
     percentage_of_training_data = 0.8
     df_train_set = df_total.sample(frac=percentage_of_training_data, random_state=0)
@@ -81,7 +85,6 @@ if split_data:
 # CASE 2: use external testing data
 else:
     print("Load external testing data\n" + line_str)
-    output_folder = 'Data/OutputFinalTest/'
     # Define Testing data
     df_train_set = df_total
     df_train_input = pd.DataFrame(df_train_set.loc[:, df_train_set.columns != 'class'])
@@ -92,7 +95,6 @@ else:
     input = testnumbers['Test_numbers'][0][0][0]
     df_test_input = pd.DataFrame(input.T)
     df_test_output = []
-
 
 #_______________________________________________________________________________________________________________________
 print("Call the different classfier\n" + line_str)
@@ -115,20 +117,25 @@ runtime_knn = time.time() - start_time
 
 #
 if split_data:
-    # ....
-    # Plot Confusion Matrix
-
-    cm = confusion_matrix(test_class, knn_predictions)
-    plot_confusion_matrix(cm, labels)
-    plt.savefig(output_folder+'CM_%s.png' %(technique), bbox_inches='tight')
-    plt.close()
 
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, knn_predictions)
-    
-    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
+
+    print("Porcentaje acierto: %.2f %%\n" % (percentage * 100))
     percentage_of_correct_predictions.append(percentage)
+    # ....
+
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, knn_predictions)
+
+    plot_confusion_matrix(cm, labels,'%s - Confusion Matrix - %.2f %%' %(technique,(percentage * 100)))
+
+    plt.savefig('Data/%sCM_%s.png' %(tag,technique), bbox_inches='tight' )
+    plt.close()
+
+
 running_time.append(runtime_knn)
 
 # ....
@@ -137,7 +144,7 @@ running_time.append(runtime_knn)
 print("Export results for algorithm: " + technique + "\n" + line_str)
 
 for name in names:
-    sio.savemat(output_folder+'%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
+    sio.savemat('Data/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(knn_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -159,13 +166,6 @@ runtime_bay = time.time() - start_time
 
 #
 if split_data:
-    # ....
-    # Plot Confusion Matrix
-
-    cm = confusion_matrix(test_class, bay_predictions)
-    plot_confusion_matrix(cm, labels)
-    plt.savefig(output_folder+'CM_%s.png' %(technique), bbox_inches='tight')
-    plt.close()
 
     # ....
     # Calculate percentages
@@ -173,15 +173,25 @@ if split_data:
     
     print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
     percentage_of_correct_predictions.append(percentage)
-running_time.append(runtime_bay)
 
-# ....
+    # ....
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, bay_predictions)
+    plot_confusion_matrix(cm, labels, '%s - Confusion Matrix - %.2f %%' % (technique, (percentage * 100)))
+
+    plt.savefig('Data/%sCM_%s.png' %(tag,technique), bbox_inches='tight' )
+    plt.close()
+
+running_time.append(runtime_bay)
+    # ....
+
 # Code to convert the results to a matlab file specified in the homework description
 
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat(output_folder+'%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
+    sio.savemat('Data/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(bay_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -200,27 +210,32 @@ runtime_som = time.time() - start_time
 
 #
 if split_data:
-    # ....
-    # Plot Confusion Matrix
-
-    cm = confusion_matrix(test_class, som_predictions)
-    plot_confusion_matrix(cm, labels)
-    plt.savefig(output_folder+'CM_%s.png' %(technique), bbox_inches='tight')
-    plt.close()
 
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, som_predictions)
-    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
+    print("Porcentaje acierto: %.2f %%\n" % (percentage * 100))
     percentage_of_correct_predictions.append(percentage)
-running_time.append(runtime_som)
+
+    # ....
+    # Plot Confusion Matrix
+
+    cm = confusion_matrix(test_class, som_predictions)
+
+    plot_confusion_matrix(cm, labels,'%s - Confusion Matrix - %.2f %%' %(technique,(percentage * 100)))
+
+    plt.savefig('Data/%sCM_%s.png' %(tag,technique), bbox_inches='tight' )
+    plt.close()
+
+running_time.append(runtime_knn)
+
 # ....
 # Code to convert the results to a matlab file specified in the homework description
 
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat(output_folder+'%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions)})
+    sio.savemat('Data/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(som_predictions)})
 
 
 
@@ -241,18 +256,22 @@ runtime_mlp = time.time() - start_time
 #
 if split_data:
     # ....
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, mlp_predictions)
+    print("Porcentaje acierto: %.2f %%\n" % (percentage * 100))
+    percentage_of_correct_predictions.append(percentage)
+
+    # ....
     # Plot Confusion Matrix
 
     cm = confusion_matrix(test_class, mlp_predictions)
-    plot_confusion_matrix(cm, labels)
-    plt.savefig(output_folder+'CM_%s.png' %(technique), bbox_inches='tight')
+
+    plot_confusion_matrix(cm, labels,'%s - Confusion Matrix - %.2f %%' %(technique,(percentage * 100)))
+
+    plt.savefig('Data/%sCM_%s.png' %(tag,technique))
     plt.close()
 
-    # ....
-    # Calculate percentages
-    percentage = metrics.accuracy_score(test_class, mlp_predictions)
-    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
-    percentage_of_correct_predictions.append(percentage)
+
 running_time.append(runtime_mlp)
 
 # ....
@@ -260,8 +279,10 @@ running_time.append(runtime_mlp)
 
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
+
+
 for name in names:
-    sio.savemat(output_folder+'%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.squeeze())})
+    sio.savemat('Data/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions)})
 
 
 #_______________________________________________________________________________________________________________________
@@ -284,18 +305,21 @@ runtime_kme = time.time() - start_time
 #
 if split_data:
     # ....
+    # Calculate percentages
+    percentage = metrics.accuracy_score(test_class, kme_predictions)
+    print("Porcentaje acierto: %.2f %%\n" % (percentage * 100))
+    percentage_of_correct_predictions.append(percentage)
+
+    # ....
     # Plot Confusion Matrix
 
     cm = confusion_matrix(test_class, kme_predictions)
-    plot_confusion_matrix(cm, labels)
-    plt.savefig(output_folder+'CM_%s.png' %(technique), bbox_inches='tight')
+
+    plot_confusion_matrix(cm, labels,'%s - Confusion Matrix - %.2f %%' %(technique,(percentage * 100)))
+
+    plt.savefig('Data/%sCM_%s.png' %(tag,technique), bbox_inches='tight' )
     plt.close()
 
-    # ....
-    # Calculate percentages
-    percentage = metrics.accuracy_score(test_class, kme_predictions)
-    print("Porcentaje acierto: %.2f %%\n" %(percentage*100))
-    percentage_of_correct_predictions.append(percentage)
 running_time.append(runtime_kme)
 
 # ....
@@ -304,7 +328,7 @@ running_time.append(runtime_kme)
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
 for name in names:
-    sio.savemat(output_folder+'%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions)})
+    sio.savemat('Data/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(kme_predictions)})
 
 #_______________________________________________________________________________________________________________________
 # Graphics
@@ -316,8 +340,7 @@ if split_data:
     y_pos = np.arange(len(techniques))
     plt.bar(y_pos, percentage_of_correct_predictions, color=(0.2, 0.4, 0.6, 0.6))
     plt.xticks(y_pos, techniques)
-    plt.savefig(output_folder+'Percentages.png', bbox_inches='tight')
-    plt.show()
+    plt.savefig('Data/%sPercentages.png'%(tag), bbox_inches='tight' )
 
 # Graphic Bar Time Elapse
 # ....
@@ -325,8 +348,8 @@ if split_data:
 y_pos = np.arange(len(techniques))
 plt.bar(y_pos, running_time, color=(0.2, 0.4, 0.6, 0.6))
 plt.xticks(y_pos, techniques)
-plt.savefig(output_folder+'Runtimes.png', bbox_inches='tight')
-plt.show()
+plt.savefig('Data/%sRuntimes.png'%(tag), bbox_inches='tight' )
+
 #_______________________________________________________________________________________________________________________
 # Result table
 # ....
