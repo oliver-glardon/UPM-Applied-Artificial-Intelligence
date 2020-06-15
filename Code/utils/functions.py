@@ -1,8 +1,10 @@
-# Group Information: Intelligencia Artificial Applicada, UPM
-# Emiliano Capogrossi, 18029
+# Group Information: Inteligencia Artificial Applicada, UPM
+# .....
+# Emiliano Capogrossi, M18029
 # Oliver Glardon, 19936
-# Sorelys Sandoval, 19237
-#_______________________________________________________________________________________________________________________
+# Sorelys Sandoval, M19237
+# .....
+# _______________________________________________________________________________________________________________________
 # imports
 from scipy.io import loadmat
 import os
@@ -17,29 +19,35 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-# from DataReader import DataReader
 
 # Parameters for printing outputs
 line_str = "-------------"
 
 
-def display_n_numbers(data, n):
-    data = np.array(data).reshape(28, 28)
+def display_n_numbers(data, n, label=[], savePath=[]):
+
+    data = data.reshape(data.shape[0], 28, 28)
     x1 = min(n // 2, 5)
     if x1 == 0:
         x1 = 1
     y1 = (n // x1)
     x = min(x1, y1)
     y = max(x1, y1)
-    fig, ax = plt.subplots(x, y, figsize=(5, 5))
-    i = 0
-    for j in range(x):
-        for k in range(y):
-            i = np.random.choice(range(len(data)))
-            ax[j][k].set_axis_off()
-            ax[j][k].imshow(data[i:i + 1][0])
-            i += 1
-    plt.show()
+    fig, ax = plt.subplots(x, y, figsize=(10, 10))
+    plt.gray()
+
+    # loop through subplots and add centroid images
+    for i, ax in enumerate(ax.flat):
+        if label != []:
+            # determine inferred label using cluster_labels dictionary
+            for key, value in label.items():
+                if i in value:
+                    ax.set_title('Inferred Class: {}'.format(key))
+        ax.matshow(data[i])
+        ax.axis('off')
+
+    if savePath!=[]:
+        plt.savefig(savePath)
 
 
 def display_number(data):
@@ -84,7 +92,7 @@ def load_data(filename):
     # Split into training and testing data
     percentage_of_training_data = 0.8
     return df_total, split_into_train_and_test(df_total, percentage_of_training_data)
-    
+
 def load_standarized_data(filename):
     df_total, (df_train_input, df_train_output, df_test_input, df_test_output) = load_data(filename)
     df_train_input, df_test_input = standardize(df_train_input, df_test_input)
