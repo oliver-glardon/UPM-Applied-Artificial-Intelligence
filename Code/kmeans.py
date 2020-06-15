@@ -17,7 +17,7 @@ from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from utils.plot_cm import plot_confusion_matrix
 import matplotlib.pyplot as plt
-
+import pickle
 import pandas as pd
 import time
 import joblib
@@ -80,39 +80,49 @@ def infer_data_labels(X_labels, cluster_labels):
     return predicted_labels
 
 
-def predict_kme(test_imgs, df_input, img_class):
+def predict_kme(test_input, df_input, img_class):
 
-    stsc = Normalizer().fit(df_input)
+    cluster_labels = []
+
+    stsc = StandardScaler().fit(df_input)
+    stsc1 = StandardScaler().fit(test_input)
     df_input_ = pd.DataFrame(stsc.transform(df_input))
-    stsc = StandardScaler().fit(df_input_)
-    df_input_ = pd.DataFrame(stsc.transform(df_input_))
+    df_test_input_ = pd.DataFrame(stsc1.transform(test_input))
 
+    train = False
     # PCA
-    minimum_explained_variance = 0.95
-    pca = PCA(minimum_explained_variance)
+    number_principal_components = 100
+    pca = PCA(n_components=number_principal_components)
 
     pca.fit(df_input_)
     principal_components_train = pca.transform(df_input_)
+    principal_components_test = pca.transform(df_test_input_)
     no_PCA = pca.n_components_
 
     # Adding Fisher Discrimant Analysis to PCA
     fisher_pca = LinearDiscriminantAnalysis()
-    train_imgs = fisher_pca.fit(principal_components_train, img_class)
-
+    fisher_pca.fit(principal_components_train, img_class)
+    train_imgs = fisher_pca.transform(principal_components_train)
+    test_imgs = fisher_pca.transform(principal_components_test)
 
     if train:
         # FIT K-MEANS
+        n = 100
 
-        kmeans = KMeans(n_clusters=200, max_iter=200)
+        kmeans = KMeans(n_clusters=n, max_iter=200)
         kmeans.fit(train_imgs)
         cluster_labels = infer_cluster_labels(kmeans, img_class)
 
     else:
         # load the model from disk
-        filename = 'Data/kme_models/_kmeModel-Cluster200-PCA+FISHER.sav'
-        kmeans = joblib.load(filename)
-        filename = 'Data/kme_models/%s_kmeModel-ClusterLabels%d-%s.sav'
-        cluster_labels = joblib.load(filename)
+        filename = 'Data/kme_models/_kmeModel-ClusterLabels100-PCA+FISHER.sav'
+        # load the model from disk
+        with open(filename, 'rb') as f:
+            cluster_labels = pickle.load(f)
+        filename = 'Data/kme_models/_kmeModel-Cluster100-PCA+FISHER.pickle'
+        # load the model from disk
+        with open(filename, 'rb') as f:
+            kmeans = pickle.load(f)
 
 
     # _______________________________________________________________________________________________________________________
