@@ -94,7 +94,8 @@ else:
     testnumbers = sio.loadmat('Data/Test_numbers_HW1.mat')
     input = testnumbers['Test_numbers'][0][0][0]
     df_test_input = pd.DataFrame(input.T)
-    df_test_output = []
+    test_class = []
+    train_class = []
 
 #_______________________________________________________________________________________________________________________
 print("Call the different classfier\n" + line_str)
@@ -249,7 +250,7 @@ start_time = time.time()
 
 
 #Function
-mlp_predictions, no_PCA = predict_mlp(df_test_input, df_test_output, df_train_input, df_train_output)
+mlp_predictions, no_PCA = predict_mlp(df_test_input, test_class, df_train_input, train_class)
 
 runtime_mlp = time.time() - start_time
 
