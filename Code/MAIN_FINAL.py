@@ -60,7 +60,7 @@ print(line_str)
 
 #_______________________________________________________________________________________________________________________
 # CHOOSE DATA USAGE TYPE
-split_data = False
+split_data = True
 
 # CASE 1: split into training and testing data
 if split_data:
@@ -89,7 +89,7 @@ else:
     testnumbers = sio.loadmat('Data/Test_numbers_HW1.mat')
     input = testnumbers['Test_numbers'][0][0][0]
     df_test_input = pd.DataFrame(input.T)
-
+    df_test_output = []
 
 #_______________________________________________________________________________________________________________________
 print("Call the different classfier\n" + line_str)
@@ -97,8 +97,8 @@ print("Call the different classfier\n" + line_str)
 #_______________________________________________________________________________________________________________________
 # Knn
 # ....
-
 technique = 'knn'
+print("\n"+technique)
 start_time = time.time()
 
 #Params
@@ -123,7 +123,7 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, knn_predictions)
-
+    print("Porcentaje acierto: %d %%\n" %(str(percentage*100)))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
@@ -141,6 +141,7 @@ for name in names:
 # ....
 
 technique = 'bay'
+print("\n"+technique)
 start_time = time.time()
 
 #Params
@@ -166,6 +167,7 @@ if split_data:
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, bay_predictions)
 
+    print("Porcentaje acierto: %d %%\n" %(str(percentage*100)))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_bay)
 
@@ -183,6 +185,7 @@ for name in names:
 # ....
 
 technique = 'som'
+print("\n"+technique)
 som = load_som_model('Data/som_models/som_S30_E200_C100_A92.p')
 start_time = time.time()
 
@@ -204,7 +207,7 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, som_predictions)
-
+    print("Porcentaje acierto: %d %%\n" % (str(percentage * 100)))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 # ....
@@ -222,6 +225,7 @@ for name in names:
 # ....
 
 technique = 'mlp'
+print("\n"+technique)
 start_time = time.time()
 
 
@@ -243,7 +247,7 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, mlp_predictions)
-
+    print("Porcentaje acierto: %d %%\n" % (str(percentage * 100)))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_mlp)
 
@@ -261,6 +265,7 @@ for name in names:
 # ....
 
 technique = 'kme'
+print("\n"+technique)
 start_time = time.time()
 
 #Params
@@ -285,7 +290,7 @@ if split_data:
     # ....
     # Calculate percentages
     percentage = metrics.accuracy_score(test_class, kme_predictions)
-
+    print("Porcentaje acierto: %d %%\n" % (str(percentage * 100)))
     percentage_of_correct_predictions.append(percentage)
     running_time.append(runtime_knn)
 
