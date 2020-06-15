@@ -269,7 +269,7 @@ if split_data:
 
     plot_confusion_matrix(cm, labels,'%s - Confusion Matrix - %.2f %%' %(technique,(percentage * 100)))
 
-    plt.savefig('Data/%sCM_%s.png' %(tag,technique))
+    plt.savefig('Data/%sCM_%s.png' %(tag,technique), bbox_inches='tight' )
     plt.close()
 
 
