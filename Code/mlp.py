@@ -30,12 +30,11 @@ def predict_mlp(test_input, test_output, df_input, img_class):
 
     test_input /= 255.
     df_input /= 255.
-
-    img_class=img_class.values
-    
-    # One-Hot
-    target_scaler = OneHotEncoder(sparse=False, categories='auto')
-    img_class = target_scaler.fit_transform(img_class.reshape(-1, 1))
+    if test_output != [] or img_class != []:
+        # One-Hot
+        target_scaler = OneHotEncoder(sparse=False, categories='auto')
+        img_class = target_scaler.fit_transform(img_class.reshape(-1, 1))
+        test_class = target_scaler.fit_transform(test_output.reshape(-1, 1))
 
     stsc = StandardScaler().fit(df_input)
     stsc1 = StandardScaler().fit(test_input)
@@ -61,8 +60,6 @@ def predict_mlp(test_input, test_output, df_input, img_class):
 
     if train:
         # FIT K-MEANS
-        test_output=test_output.values
-        test_class = target_scaler.fit_transform(test_output.reshape(-1, 1))
 
         mlp2 = algorithms.Momentum(
             [
