@@ -37,8 +37,6 @@ def preprocess_data(data_to_transform, pca_model=None, n_pca=100, data_train=[])
     else:
         return out_data
 #_______________________________________________________________________________________________________________________
-# BORRARRRR
-# Para entrenar sin normalizar no envies pca
 def train_som(train_data, train_targets, 
           grid_size=30, 
           n_epochs=100, 

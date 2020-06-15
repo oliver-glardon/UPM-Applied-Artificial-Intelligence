@@ -201,7 +201,7 @@ for name in names:
 
 technique = 'som'
 print("\n"+technique)
-som = load_som_model('Data/som_models/som_S30_E200_C100_A92.p')
+som = load_som_model('Data/som_models/som_S30_E200_C50_LR2_Inorm_PCA_A94.p')
 start_time = time.time()
 
 #Function
