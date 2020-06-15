@@ -6,8 +6,10 @@
 # imports
 from utils.functions import *
 import numpy as np
+import pandas as pd
 from scipy import stats
-from utils.plot_cm import plot_confusion_matrix
+import matplotlib.gridspec as gridspec
+import matplotlib.patches as mpatches
 from neupy import algorithms, utils, init
 from sklearn.metrics import mean_squared_error, accuracy_score
 import pickle
@@ -46,9 +48,9 @@ def train_som(train_data, train_targets,
           plot_flag=False, 
           extra_str='', dir_path='../Data/som_models/'):
     # Preprocess data if needed
-    if type(train_data)=='pandas.core.frame.DataFrame':
+    if type(train_data)==pd.core.frame.DataFrame:
         train_data = train_data.to_numpy()
-    if type(train_targets)=='pandas.core.frame.DataFrame':
+    if type(train_targets)==pd.core.frame.DataFrame:
         train_targets = train_targets.to_numpy(dtype='int').squeeze()
     if pca_model is None and n_pca is not None:
         train_data, pca_model = preprocess_data(train_data, n_pca)
@@ -111,14 +113,24 @@ def train_som(train_data, train_targets,
 
     return som
 
-def plot_som(som, train_data, train_targets):
+def plot_som(som, images, train_targets, train_data=None):
     # PLot SOM map
+    # Reformat data if needed
+    if type(images)==pd.core.frame.DataFrame:
+        images = images.to_numpy()
+    if type(train_targets)==pd.core.frame.DataFrame:
+        train_targets = train_targets.to_numpy(dtype='int')
+    if train_targets.dtype != 'int':
+        train_targets = train_targets.astype('int')
+    if train_data is None and images.shape[1]!=som.n_inputs:
+        if som.pca_model is not None:
+            train_data = preprocess_data(images, som.pca_model)
+        else:
+            print("Sorry, you must add the data")
     clusters = som.predict(train_data).argmax(axis=1)
+    som_predictions = np.zeros([train_targets.size,1])
 
     fig = plt.figure(figsize=(12, 12))
-
-    som_predictions = np.zeros([train_targets.size,1])
-    images = train_data
     colors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff', '#000000']
     [GRID_HEIGHT, GRID_WIDTH] =  som.features_grid
     grid = gridspec.GridSpec(GRID_HEIGHT, GRID_WIDTH)
@@ -147,6 +159,18 @@ def plot_som(som, train_data, train_targets):
             plt.imshow(sample.reshape((28, 28)), cmap='Greys')
             ax.set_xticks([])
             ax.set_yticks([])
+    
+    legend_handles = []
+    for label in range(10):
+        patch = mpatches.Patch(color=colors[label], label=label)
+        legend_handles.append(patch)
+
+    fig.legend(handles=legend_handles, 
+               loc="upper center", 
+               ncol=10,
+              )
+    fig.subplots_adjust(top=0.95)    
+    fig.savefig('../Data/som_models/somMap2D.png')
     plt.show()
     return fig
 
