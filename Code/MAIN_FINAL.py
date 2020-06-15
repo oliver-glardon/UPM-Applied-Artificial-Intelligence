@@ -62,6 +62,11 @@ print(line_str)
 # CHOOSE DATA USAGE TYPE
 split_data = True
 
+if split_data:
+    tag="TRAIN_"
+else:
+    tag=""
+
 # CASE 1: split into training and testing data
 if split_data:
     print("Split into training and testing data\n" + line_str)
@@ -256,8 +261,10 @@ if split_data:
 
 print("Export results for algorithm: "+ technique +"\n" + line_str)
 
+
+
 for name in names:
-    sio.savemat('Data/Output/%s_%s.mat' %(name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
+    sio.savemat('Data/Output/%s%s_%s.mat' %(tag,name,technique), { 'names': names,'PCA': no_PCA, 'class': np.transpose(mlp_predictions.values)})
 
 
 #_______________________________________________________________________________________________________________________
